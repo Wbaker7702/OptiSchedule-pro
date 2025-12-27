@@ -1,8 +1,8 @@
 import React from 'react';
 import Header from '../components/Header';
 import StatCard from '../components/StatCard';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
-import { AlertCircle, CheckCircle2, Clock, Users, ShieldAlert, ArrowRight, ShieldCheck, ThumbsUp, BarChart as BarChartIcon } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { CheckCircle2, Clock, ShieldAlert, ShieldCheck, ThumbsUp, Scale, TrendingUp } from 'lucide-react';
 import { DATE_STRING, FISCAL_METRICS } from '../constants';
 
 const data = [
@@ -15,11 +15,6 @@ const data = [
   { time: '8 PM', value: 45 },
 ];
 
-const resourceAllocationData = [
-  { name: 'Stationary (Passive)', value: 35, color: '#ef4444' }, // Red for inefficient
-  { name: 'Zone Defense (Active)', value: 65, color: '#22c55e' }, // Green for revenue generating
-];
-
 const Dashboard: React.FC = () => {
   return (
     <div className="flex-1 bg-gray-50 overflow-auto">
@@ -27,38 +22,43 @@ const Dashboard: React.FC = () => {
       
       <div className="p-8 max-w-7xl mx-auto space-y-6">
         
-        {/* Fiscal Foundation Alert Banner */}
-        <div className="bg-slate-900 rounded-xl p-6 flex flex-col xl:flex-row items-center justify-between shadow-lg border border-slate-700 gap-6">
-           <div className="flex items-center gap-5 w-full xl:w-auto">
+        {/* The Fiscal Foundation Section */}
+        <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-6 flex flex-col xl:flex-row items-center justify-between shadow-lg border border-slate-700 gap-6 relative overflow-hidden">
+           {/* Background decorative element */}
+           <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+              <Scale className="w-48 h-48 text-white" />
+           </div>
+
+           <div className="flex items-center gap-5 w-full xl:w-auto relative z-10">
               <div className="p-3 bg-red-500/20 rounded-lg border border-red-500/30 shrink-0">
                  <ShieldAlert className="w-8 h-8 text-red-400" />
               </div>
               <div>
-                 <h2 className="text-white font-bold text-lg">Fiscal Health Monitor</h2>
-                 <p className="text-slate-400 text-sm">Execution Leakage: <span className="text-red-400 font-mono font-bold">$90,000/week</span> (Market Wide)</p>
+                 <h2 className="text-white font-bold text-lg">The Fiscal Foundation</h2>
+                 <p className="text-slate-400 text-sm">Execution Leakage: <span className="text-red-400 font-mono font-bold">${FISCAL_METRICS.executionLeakage.toLocaleString()}/week</span> (Market Wide)</p>
               </div>
            </div>
            
-           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 w-full xl:w-auto border-t xl:border-t-0 xl:border-l border-slate-700 pt-6 xl:pt-0 xl:pl-8">
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 w-full xl:w-auto border-t xl:border-t-0 xl:border-l border-slate-700 pt-6 xl:pt-0 xl:pl-8 relative z-10">
                <div className="text-center xl:text-left">
                   <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Labor Surplus</p>
-                  <p className="text-2xl font-bold text-green-400">15%</p>
+                  <p className="text-2xl font-bold text-green-400">{FISCAL_METRICS.laborSurplusPct}%</p>
                </div>
                <div className="text-center xl:text-left">
-                  <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Hrs Recaptured</p>
-                  <p className="text-2xl font-bold text-white">142</p>
+                  <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Target Recovery</p>
+                  <p className="text-2xl font-bold text-white">{FISCAL_METRICS.targetWeeklyHoursRecapture} <span className="text-sm font-normal text-slate-400">hrs</span></p>
                </div>
                <div className="text-center xl:text-left">
-                  <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Peak Coverage</p>
+                  <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">ROI Multiplier</p>
                   <div className="flex items-center justify-center xl:justify-start gap-1">
-                     <p className="text-2xl font-bold text-blue-400">100%</p>
-                     <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                     <p className="text-2xl font-bold text-blue-400">{FISCAL_METRICS.currentROI}x</p>
+                     <TrendingUp className="w-4 h-4 text-blue-400" />
                   </div>
                </div>
                <div className="text-center xl:text-left">
-                  <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Service Quality</p>
+                  <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Annual Impact</p>
                   <div className="flex items-center justify-center xl:justify-start gap-1">
-                     <span className="text-sm font-bold text-white bg-green-600/30 px-2 py-1 rounded border border-green-500/30">Maintained</span>
+                     <span className="text-lg font-bold text-white">${FISCAL_METRICS.annualRecoveryTarget}M</span>
                   </div>
                </div>
            </div>
@@ -70,7 +70,7 @@ const Dashboard: React.FC = () => {
             title="Capital Recovered" 
             value="$24,600" 
             subtitle="YTD (Store 5065 Pilot)"
-            trend="+10.3x ROI" 
+            trend={`+${FISCAL_METRICS.currentROI}x ROI`} 
             trendDirection="up"
             icon={<div className="text-green-600 font-bold">$</div>}
           />
@@ -140,4 +140,50 @@ const Dashboard: React.FC = () => {
                       </span>
                     </div>
                     <div className="text-right">
-                      
+                      <span className="text-xs font-semibold inline-block text-red-600">
+                        35%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-red-200">
+                    <div style={{ width: "35%" }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-red-500"></div>
+                  </div>
+                </div>
+
+                <div className="relative pt-1">
+                  <div className="flex mb-2 items-center justify-between">
+                    <div>
+                      <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-green-600 bg-green-200">
+                        Zone Defense (Active)
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs font-semibold inline-block text-green-600">
+                        65%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-green-200">
+                    <div style={{ width: "65%" }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"></div>
+                  </div>
+                </div>
+                
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                    <div className="flex items-start gap-3">
+                        <ThumbsUp className="w-5 h-5 text-blue-500 mt-0.5" />
+                        <div>
+                            <p className="text-sm font-semibold text-gray-900">Optimization Goal</p>
+                            <p className="text-xs text-gray-600 mt-1">Reduce stationary hours by {FISCAL_METRICS.laborSurplusPct}% to recapture hours.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;

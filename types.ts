@@ -41,4 +41,5 @@ export interface DepartmentMetric {
   sales: string;
   extraMetricLabel: string;
   extraMetricValue: string;
+  waitTime: string;
 }
