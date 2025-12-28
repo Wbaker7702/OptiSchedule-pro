@@ -1,13 +1,78 @@
+
 import React, { useState } from 'react';
 import Header from '../components/Header';
+// Fix: Import FISCAL_METRICS from constants and View from types
 import { FISCAL_METRICS } from '../constants';
-import { Book, Shield, Scale, Zap, Info, ArrowRight, TrendingUp, Calculator, FileCheck, Users, Terminal, Database, Code, ShieldCheck } from 'lucide-react';
+import { View } from '../types';
+import { Book, Shield, Scale, Zap, Info, ArrowRight, TrendingUp, Calculator, FileCheck, Users, Terminal, Database, Code, ShieldCheck, Loader2, ExternalLink, BellRing } from 'lucide-react';
 
-const Playbook: React.FC = () => {
+interface PlaybookProps {
+  setCurrentView?: (view: any) => void;
+}
+
+const Playbook: React.FC<PlaybookProps> = ({ setCurrentView }) => {
   const [recaptureInput, setRecaptureInput] = useState(FISCAL_METRICS.targetWeeklyHoursRecapture);
+  const [activeActions, setActiveActions] = useState<Record<string, boolean>>({});
+  const [lastAlert, setLastAlert] = useState<string | null>(null);
   
   const projectedSavings = recaptureInput * FISCAL_METRICS.avgPayRate * 52;
   const projectedProtection = projectedSavings * FISCAL_METRICS.currentROI;
+
+  const simulateAction = (id: string, duration = 1500) => {
+    setActiveActions(prev => ({ ...prev, [id]: true }));
+    setTimeout(() => {
+      setActiveActions(prev => ({ ...prev, [id]: false }));
+      if (id === 'alert') {
+        setLastAlert(`ALERT: High customer volume detected in Front End. Reallocating floor staff...`);
+        setTimeout(() => setLastAlert(null), 4000);
+      }
+    }, duration);
+  };
+
+  const engineRoomCards = [
+    {
+      id: 'lint',
+      title: "Lint Rules (Operational)",
+      desc: "Automated checks for over-staffing vs. transaction volume.",
+      icon: <FileCheck className="w-5 h-5 text-emerald-400" />,
+      code: "Audit::Efficiency.lint!",
+      actionLabel: "Run Linter",
+      action: () => simulateAction('lint'),
+      isAsync: true
+    },
+    {
+      id: 'sync',
+      title: "HubSpot Sync Worker",
+      desc: "Background jobs processing 2,000+ CRM events/sec.",
+      icon: <Database className="w-5 h-5 text-orange-400" />,
+      code: "HubspotSyncJob.perform",
+      actionLabel: "Manage Sync",
+      // Fix: Use View enum instead of string
+      action: () => setCurrentView?.(View.SCHEDULING),
+      isAsync: false
+    },
+    {
+      id: 'audit',
+      title: "Audit Trails",
+      desc: "Every schedule adjustment is version-controlled and immutable.",
+      icon: <ShieldCheck className="w-5 h-5 text-blue-400" />,
+      code: "AuditTrail.log_change",
+      actionLabel: "View Live Logs",
+      // Fix: Use View enum instead of string
+      action: () => setCurrentView?.(View.OPERATIONS),
+      isAsync: false
+    },
+    {
+      id: 'alert',
+      title: "Real-time Pub/Sub",
+      desc: "Instant floor alerts via ActionCable for immediate 'Zone Defense'.",
+      icon: <Zap className="w-5 h-5 text-purple-400" />,
+      code: "Broadcast.alert('Surge')",
+      actionLabel: "Trigger Floor Alert",
+      action: () => simulateAction('alert'),
+      isAsync: true
+    }
+  ];
 
   return (
     <div className="flex-1 bg-gray-50 overflow-auto">
@@ -76,42 +141,48 @@ const Playbook: React.FC = () => {
                     <span className="px-2 py-1 bg-slate-800 rounded text-[10px] font-mono text-slate-300">PostgreSQL</span>
                     <span className="px-2 py-1 bg-slate-800 rounded text-[10px] font-mono text-slate-300">Redis Cache</span>
                  </div>
+
+                 {lastAlert && (
+                   <div className="p-4 bg-purple-600/20 border border-purple-500/30 rounded-xl animate-in slide-in-from-left-4 fade-in duration-300">
+                      <div className="flex items-center gap-3">
+                         <BellRing className="w-5 h-5 text-purple-400 animate-bounce" />
+                         <p className="text-xs font-mono text-purple-100">{lastAlert}</p>
+                      </div>
+                   </div>
+                 )}
               </div>
 
               <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                 {[
-                   {
-                     title: "Lint Rules (Operational)",
-                     desc: "Automated checks for over-staffing vs. transaction volume.",
-                     icon: <FileCheck className="w-5 h-5 text-emerald-400" />,
-                     code: "Audit::Efficiency.lint!"
-                   },
-                   {
-                     title: "HubSpot Sync Worker",
-                     desc: "Background jobs processing 2,000+ CRM events/sec.",
-                     icon: <Database className="w-5 h-5 text-orange-400" />,
-                     code: "HubspotSyncJob.perform_async"
-                   },
-                   {
-                     title: "Audit Trails",
-                     desc: "Every schedule adjustment is version-controlled and immutable.",
-                     icon: <ShieldCheck className="w-5 h-5 text-blue-400" />,
-                     code: "AuditTrail.log_change(id)"
-                   },
-                   {
-                     title: "Real-time Pub/Sub",
-                     desc: "Instant floor alerts via ActionCable for immediate 'Zone Defense' calls.",
-                     icon: <Zap className="w-5 h-5 text-purple-400" />,
-                     code: "Broadcast.alert('Surge')"
-                   }
-                 ].map((box, i) => (
-                   <div key={i} className="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-blue-500/50 transition-colors group">
+                 {engineRoomCards.map((box, i) => (
+                   <div key={i} className="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-blue-500/50 transition-all group flex flex-col">
                       <div className="flex justify-between items-start mb-4">
                         <div className="p-2 bg-slate-900 rounded-lg">{box.icon}</div>
                         <span className="text-[9px] font-mono text-slate-500 uppercase">{box.code}</span>
                       </div>
                       <h4 className="text-white font-bold mb-1">{box.title}</h4>
-                      <p className="text-slate-400 text-xs leading-relaxed">{box.desc}</p>
+                      <p className="text-slate-400 text-xs leading-relaxed mb-6">{box.desc}</p>
+                      
+                      <button 
+                        onClick={box.action}
+                        disabled={activeActions[box.id]}
+                        className={`mt-auto w-full py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                          box.isAsync 
+                            ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20 hover:bg-blue-600 hover:text-white' 
+                            : 'bg-slate-700/50 text-slate-300 border border-slate-600 hover:bg-slate-600 hover:text-white'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        {activeActions[box.id] ? (
+                          <>
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            Executing...
+                          </>
+                        ) : (
+                          <>
+                            {box.isAsync ? <Terminal className="w-3 h-3" /> : <ExternalLink className="w-3 h-3" />}
+                            {box.actionLabel}
+                          </>
+                        )}
+                      </button>
                    </div>
                  ))}
               </div>

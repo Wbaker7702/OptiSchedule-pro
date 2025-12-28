@@ -38,7 +38,7 @@ const App: React.FC = () => {
       case View.TEAM:
         return <Team />;
       case View.PLAYBOOK:
-        return <Playbook />;
+        return <Playbook setCurrentView={setCurrentView} />;
       default:
         return <Dashboard />;
     }
