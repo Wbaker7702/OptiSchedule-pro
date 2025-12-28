@@ -3,17 +3,35 @@ import { Employee, Product, HeatmapDataPoint, DepartmentMetric } from './types';
 export const CURRENT_USER = "Wesley Baker";
 export const STORE_NUMBER = "5065";
 export const DATE_STRING = "Saturday, December 13, 2025";
+export const APP_VERSION = "3.0.0-enterprise";
 
-// Metrics derived from "The Scaling Formula" & "Fiscal Foundation" notes + PDF Updates
+export const SYSTEM_HEALTH = {
+  status: 'Operational',
+  uptime: '99.99%',
+  latency: '18ms',
+  environment: 'Production',
+  railsVersion: '7.1.3',
+  syncCycle: '00:04:12'
+};
+
+// Metrics derived from "The Scaling Formula" & "Fiscal Foundation"
 export const FISCAL_METRICS = {
   avgPayRate: 14.00,
   targetWeeklyHoursRecapture: 186,
   executionLeakage: 90000, // Per week in "Execution Leakage"
   currentROI: 10.3, // "For every $1 invested we protect $10.30"
   annualRecoveryTarget: 4.68, // Millions
-  vision2028: 491, // Millions (Updated from Slide 11: "Enterprise Opportunity $491M")
+  vision2028: 491, // Millions (Enterprise Opportunity)
   laborSurplusPct: 15, // "Identifying a 15% labor surplus"
 };
+
+export const OPERATIONAL_AUDITS = [
+  { id: 'aud-101', severity: 'error', code: 'LEAK_01', message: 'Efficiency Variance > 15% detected in Front End', file: 'Department: Front End', fix: 'Apply Zone Defense' },
+  { id: 'aud-102', severity: 'warning', code: 'SYNC_04', message: 'HubSpot Lead Sync Latency (240ms)', file: 'Integration: HS_API', fix: 'Flush Sync Buffer' },
+  { id: 'aud-103', severity: 'info', code: 'OPT_09', message: 'Optimal staffing achieved for peak hour', file: 'Schedule: Sat_12_15', fix: 'No action' },
+  { id: 'aud-104', severity: 'error', code: 'STOCK_02', message: 'Critical Inventory Gap during Traffic Surge', file: 'Inventory: Grocery', fix: 'Prioritize Stocking' },
+  { id: 'aud-105', severity: 'warning', code: 'LABOR_02', message: 'Predictive Surplus: 12.5 hrs available at 2 PM', file: 'Department: Apparel', fix: 'Reassign to Stocking' },
+];
 
 export const HUBSPOT_ROI_DATA = {
   marketingLeads: { value: 150, label: "Marketing Leads", subtext: "+150% Growth" },
@@ -50,12 +68,12 @@ export const HEATMAP_DATA: HeatmapDataPoint[] = [
   { hour: '8 AM', transactionVolume: 45, staffing: 8, efficiency: 85 },
   { hour: '9 AM', transactionVolume: 65, staffing: 10, efficiency: 75 },
   { hour: '10 AM', transactionVolume: 120, staffing: 12, efficiency: 45 },
-  { hour: '11 AM', transactionVolume: 150, staffing: 12, efficiency: 30 }, // High inefficiency
-  { hour: '12 PM', transactionVolume: 180, staffing: 14, efficiency: 25 }, // Critical
+  { hour: '11 AM', transactionVolume: 150, staffing: 12, efficiency: 30 },
+  { hour: '12 PM', transactionVolume: 180, staffing: 14, efficiency: 25 },
   { hour: '1 PM', transactionVolume: 160, staffing: 14, efficiency: 35 },
   { hour: '2 PM', transactionVolume: 110, staffing: 12, efficiency: 55 },
   { hour: '3 PM', transactionVolume: 90, staffing: 10, efficiency: 70 },
-  { hour: '4 PM', transactionVolume: 140, staffing: 10, efficiency: 40 }, // Peak after work/school
+  { hour: '4 PM', transactionVolume: 140, staffing: 10, efficiency: 40 },
   { hour: '5 PM', transactionVolume: 170, staffing: 12, efficiency: 30 },
 ];
 

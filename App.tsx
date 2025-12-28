@@ -6,8 +6,7 @@ import Operations from './pages/Operations';
 import Inventory from './pages/Inventory';
 import Team from './pages/Team';
 import Analytics from './pages/Analytics';
-import Explorer from './pages/Explorer';
-import Settings from './pages/Settings';
+import Playbook from './pages/Playbook';
 import Login from './components/Login';
 import { View } from './types';
 
@@ -38,10 +37,8 @@ const App: React.FC = () => {
         return <Analytics />;
       case View.TEAM:
         return <Team />;
-      case View.EXPLORER:
-        return <Explorer />;
-      case View.SETTINGS:
-        return <Settings />;
+      case View.PLAYBOOK:
+        return <Playbook />;
       default:
         return <Dashboard />;
     }
