@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
-import { DEPARTMENT_METRICS, OPERATIONAL_AUDITS } from '../constants';
-import { RefreshCcw, Users, DollarSign, TrendingUp, Clock, ShieldAlert, CheckCircle, Info, Terminal, Search, AlertCircle, Play } from 'lucide-react';
+import { DEPARTMENT_METRICS, OPERATIONAL_AUDITS as INITIAL_AUDITS } from '../constants';
+import { RefreshCcw, Users, DollarSign, TrendingUp, Clock, ShieldAlert, CheckCircle, Info, Terminal, Search, AlertCircle, Play, Download, Loader2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine, Label } from 'recharts';
 
 const salesData = [
@@ -15,6 +15,9 @@ const salesData = [
 
 const Operations: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'metrics' | 'audit'>('metrics');
+  const [audits, setAudits] = useState(INITIAL_AUDITS);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [fixingId, setFixingId] = useState<string | null>(null);
 
   const chartData = salesData.map(item => {
     const metric = DEPARTMENT_METRICS.find(d => d.name === item.name);
@@ -27,6 +30,46 @@ const Operations: React.FC = () => {
 
   const totalSales = salesData.reduce((acc, curr) => acc + curr.sales, 0);
   const averageSales = totalSales / salesData.length;
+
+  const handleQuickFix = (id: string) => {
+    setFixingId(id);
+    // Simulate a fix process
+    setTimeout(() => {
+      setAudits(prev => prev.filter(a => a.id !== id));
+      setFixingId(null);
+    }, 800);
+  };
+
+  const handleFullSync = () => {
+    setIsSyncing(true);
+    // Simulate a full system scan/sync
+    setTimeout(() => {
+      setIsSyncing(false);
+      // Optional: Logic to "find" new issues or reset the list if desired
+    }, 2500);
+  };
+
+  const handleExportCSV = () => {
+    const headers = ['ID', 'Severity', 'Code', 'Message', 'Entity', 'Fix Action'];
+    const rows = audits.map(a => [
+      a.id,
+      a.severity,
+      a.code,
+      `"${a.message.replace(/"/g, '""')}"`,
+      `"${a.file.replace(/"/g, '""')}"`,
+      `"${a.fix.replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `store_5065_audit_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -75,7 +118,11 @@ const Operations: React.FC = () => {
            >
              <Terminal className="w-4 h-4" />
              Operational Linter
-             <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">2</span>
+             {audits.length > 0 && (
+                <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold animate-pulse">
+                  {audits.length}
+                </span>
+             )}
              {activeTab === 'audit' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full" />}
            </button>
         </div>
@@ -226,19 +273,25 @@ const Operations: React.FC = () => {
                 <div className="flex items-center gap-3">
                    <div className="bg-slate-800 rounded-lg p-1.5 flex items-center gap-2">
                       <div className="flex items-center gap-1 text-[10px] font-bold px-2 text-red-400 border-r border-slate-700">
-                         <AlertCircle className="w-3 h-3" /> 2 ERRORS
+                         <AlertCircle className="w-3 h-3" /> {audits.filter(a => a.severity === 'error').length} ERRORS
                       </div>
                       <div className="flex items-center gap-1 text-[10px] font-bold px-2 text-orange-400 border-r border-slate-700">
-                         <Info className="w-3 h-3" /> 1 WARN
+                         <Info className="w-3 h-3" /> {audits.filter(a => a.severity === 'warning').length} WARN
                       </div>
                       <div className="flex items-center gap-1 text-[10px] font-bold px-2 text-blue-400">
-                         <CheckCircle className="w-3 h-3" /> 1 OK
+                         <CheckCircle className="w-3 h-3" /> {INITIAL_AUDITS.length - audits.length + audits.filter(a => a.severity === 'info').length} OK
                       </div>
                    </div>
                 </div>
              </div>
              
-             <div className="p-0">
+             <div className="p-0 min-h-[300px] relative">
+                {isSyncing && (
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-20 flex flex-col items-center justify-center text-white">
+                        <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+                        <p className="font-mono text-sm tracking-widest uppercase animate-pulse">Running Full System Sync...</p>
+                    </div>
+                )}
                 <table className="w-full text-left font-mono">
                    <thead className="bg-slate-800/30 text-slate-500 text-[10px] uppercase tracking-widest border-b border-slate-800">
                       <tr>
@@ -250,40 +303,82 @@ const Operations: React.FC = () => {
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-800/50">
-                      {OPERATIONAL_AUDITS.map((audit) => (
-                        <tr key={audit.id} className="hover:bg-slate-800/20 group transition-colors">
-                           <td className="px-6 py-4">
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                                 audit.severity === 'error' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                                 audit.severity === 'warning' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
-                                 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                              }`}>
-                                 {audit.severity}
-                              </span>
-                           </td>
-                           <td className="px-6 py-4 text-slate-300 text-xs">{audit.code}</td>
-                           <td className="px-6 py-4 text-white text-xs font-medium">{audit.message}</td>
-                           <td className="px-6 py-4 text-slate-500 text-xs italic">{audit.file}</td>
-                           <td className="px-6 py-4 text-right">
-                              {audit.fix !== 'No action' ? (
-                                 <button className="text-blue-400 hover:text-white flex items-center gap-1.5 text-[10px] font-bold ml-auto bg-blue-500/10 px-3 py-1 rounded-md border border-blue-500/20 hover:bg-blue-500/30 transition-all uppercase">
-                                    <Play className="w-3 h-3" /> {audit.fix}
-                                 </button>
-                              ) : (
-                                 <span className="text-slate-600 text-[10px]">VERIFIED</span>
-                              )}
-                           </td>
+                      {audits.length > 0 ? (
+                        audits.map((audit) => (
+                            <tr key={audit.id} className="hover:bg-slate-800/20 group transition-colors">
+                               <td className="px-6 py-4">
+                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                     audit.severity === 'error' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                                     audit.severity === 'warning' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
+                                     'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                  }`}>
+                                     {audit.severity}
+                                  </span>
+                               </td>
+                               <td className="px-6 py-4 text-slate-300 text-xs">{audit.code}</td>
+                               <td className="px-6 py-4 text-white text-xs font-medium">{audit.message}</td>
+                               <td className="px-6 py-4 text-slate-500 text-xs italic">{audit.file}</td>
+                               <td className="px-6 py-4 text-right">
+                                  {audit.fix !== 'No action' ? (
+                                     <button 
+                                        onClick={() => handleQuickFix(audit.id)}
+                                        disabled={fixingId === audit.id}
+                                        className="text-blue-400 hover:text-white flex items-center gap-1.5 text-[10px] font-bold ml-auto bg-blue-500/10 px-3 py-1 rounded-md border border-blue-500/20 hover:bg-blue-500/30 transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+                                     >
+                                        {fixingId === audit.id ? (
+                                            <>
+                                                <Loader2 className="w-3 h-3 animate-spin" /> Fixing...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Play className="w-3 h-3" /> {audit.fix}
+                                            </>
+                                        )}
+                                     </button>
+                                  ) : (
+                                     <span className="text-slate-600 text-[10px]">VERIFIED</span>
+                                  )}
+                               </td>
+                            </tr>
+                        ))
+                      ) : (
+                        <tr>
+                            <td colSpan={5} className="px-6 py-20 text-center">
+                                <div className="flex flex-col items-center">
+                                    <CheckCircle className="w-12 h-12 text-emerald-500 mb-4 opacity-20" />
+                                    <p className="text-slate-500 text-sm tracking-wide">No active linting errors. System clean.</p>
+                                    <button 
+                                        onClick={() => setAudits(INITIAL_AUDITS)}
+                                        className="mt-4 text-blue-500 hover:text-blue-400 text-xs font-bold"
+                                    >
+                                        Reset Audit Log
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
-                      ))}
+                      )}
                    </tbody>
                 </table>
              </div>
 
              <div className="p-4 bg-slate-800/30 border-t border-slate-800 flex justify-between items-center">
-                <p className="text-[10px] text-slate-500">Scan Complete: Dec 13, 2025 • 0.04s Execution Time</p>
+                <p className="text-[10px] text-slate-500">Scan Complete: Dec 13, 2025 • {isSyncing ? '...' : '0.04s'} Execution Time</p>
                 <div className="flex gap-2">
-                   <button className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white text-xs rounded transition-colors border border-slate-600">Export Audit CSV</button>
-                   <button className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded transition-colors font-bold shadow-lg shadow-blue-500/20">Run Full System Sync</button>
+                   <button 
+                    onClick={handleExportCSV}
+                    disabled={audits.length === 0}
+                    className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white text-xs rounded transition-colors border border-slate-600 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                   >
+                     <Download className="w-3 h-3" /> Export Audit CSV
+                   </button>
+                   <button 
+                    onClick={handleFullSync}
+                    disabled={isSyncing}
+                    className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded transition-colors font-bold shadow-lg shadow-blue-500/20 flex items-center gap-2 disabled:opacity-50"
+                   >
+                     {isSyncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCcw className="w-3 h-3" />}
+                     Run Full System Sync
+                   </button>
                 </div>
              </div>
           </div>
