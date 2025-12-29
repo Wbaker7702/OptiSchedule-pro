@@ -25,6 +25,12 @@ const Audit: React.FC = () => {
     { id: 'LOG-006', action: 'System Backup', user: 'System', role: 'Automated', date: '2024-03-20 12:00:00', details: 'Daily database backup', status: 'Success', ip: 'Localhost' },
   ];
 
+  const filteredLogs = logs.filter(log => 
+    log.action.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    log.details.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="flex-1 bg-gray-50 overflow-auto">
       <Header title="Security Audit Log" subtitle="Monitor system access and critical actions" />
@@ -72,11 +78,7 @@ const Audit: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {logs.filter(log => 
-                    log.action.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                    log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    log.details.toLowerCase().includes(searchTerm.toLowerCase())
-                ).map((log) => (
+                {filteredLogs.map((log) => (
                   <tr key={log.id} className="hover:bg-gray-50 transition-colors">
                     <td className="p-4 text-sm text-gray-600 font-mono">{log.date}</td>
                     <td className="p-4">
@@ -111,7 +113,7 @@ const Audit: React.FC = () => {
           </div>
           
           <div className="mt-4 flex justify-between items-center text-sm text-gray-500">
-             <p>Showing {logs.length} entries</p>
+             <p>Showing {filteredLogs.length} entries</p>
              <div className="flex gap-2">
                 <button className="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50">Previous</button>
                 <button className="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50">Next</button>
