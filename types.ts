@@ -6,6 +6,9 @@ export enum View {
   ANALYTICS = 'ANALYTICS',
   TEAM = 'TEAM',
   PLAYBOOK = 'PLAYBOOK',
+  AUDIT = 'AUDIT',
+  TRAINING = 'TRAINING',
+  MAINTENANCE = 'MAINTENANCE',
 }
 
 export interface Employee {

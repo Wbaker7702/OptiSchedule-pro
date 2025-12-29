@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, CalendarDays, Activity, Package, BarChart3, Users, Settings, LogOut, BookOpen, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, Activity, Package, BarChart3, Users, Settings, LogOut, BookOpen, ShieldCheck, GraduationCap, Wrench } from 'lucide-react';
 import { View } from '../types';
 import { APP_VERSION } from '../constants';
 
@@ -18,6 +18,9 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, onLogout
     { id: View.ANALYTICS, label: 'Analytics & Reports', icon: BarChart3 },
     { id: View.TEAM, label: 'Team Management', icon: Users },
     { id: View.PLAYBOOK, label: 'Strategy Playbook', icon: BookOpen },
+    { id: View.AUDIT, label: 'Audit Logs', icon: ShieldCheck },
+    { id: View.TRAINING, label: 'Training Portal', icon: GraduationCap },
+    { id: View.MAINTENANCE, label: 'Facilities Maint.', icon: Wrench },
   ];
 
   return (
