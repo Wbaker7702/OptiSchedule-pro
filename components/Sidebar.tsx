@@ -18,6 +18,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, onLogout
     { id: View.ANALYTICS, label: 'Analytics & Reports', icon: BarChart3 },
     { id: View.TEAM, label: 'Team Management', icon: Users },
     { id: View.PLAYBOOK, label: 'Strategy Playbook', icon: BookOpen },
+    { id: View.AUDIT, label: 'Audit Logs', icon: ShieldCheck },
   ];
 
   return (

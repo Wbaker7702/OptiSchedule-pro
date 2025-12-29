@@ -7,6 +7,7 @@ import Inventory from './pages/Inventory';
 import Team from './pages/Team';
 import Analytics from './pages/Analytics';
 import Playbook from './pages/Playbook';
+import Audit from './pages/Audit';
 import Login from './components/Login';
 import { View } from './types';
 
@@ -39,6 +40,8 @@ const App: React.FC = () => {
         return <Team />;
       case View.PLAYBOOK:
         return <Playbook setCurrentView={setCurrentView} />;
+      case View.AUDIT:
+        return <Audit />;
       default:
         return <Dashboard />;
     }
