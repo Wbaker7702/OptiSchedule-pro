@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, AreaChart, Area, Cell } from 'recharts';
-import { Download, FileText, TrendingUp, DollarSign, Users, Scale, Target, ArrowUpRight } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, Cell } from 'recharts';
+import { Download, FileText, TrendingUp, DollarSign, Users, Scale, Target, ArrowUpRight, Loader2 } from 'lucide-react';
 import { FISCAL_METRICS } from '../constants';
 
 const laborPivotData = [
@@ -21,12 +21,35 @@ const scalingData = [
 ];
 
 const reports = [
-  { name: 'Variance Reduction Strategy (CEO/CFO)', date: 'Dec 14, 2025', size: '1.2 MB' },
-  { name: 'Resource Reallocation Plan (Store Mgr)', date: 'Dec 10, 2025', size: '845 KB' },
-  { name: 'Store 5065 Pilot Proof of Concept', date: 'Dec 01, 2025', size: '2.4 MB' },
+  { id: 'rep-1', name: 'Variance Reduction Strategy (CEO/CFO)', date: 'Dec 14, 2025', size: '1.2 MB' },
+  { id: 'rep-2', name: 'Resource Reallocation Plan (Store Mgr)', date: 'Dec 10, 2025', size: '845 KB' },
+  { id: 'rep-3', name: 'Store 5065 Pilot Proof of Concept', date: 'Dec 01, 2025', size: '2.4 MB' },
 ];
 
 const Analytics: React.FC = () => {
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  const handleDownloadReport = (report: typeof reports[0]) => {
+    setDownloadingId(report.id);
+    
+    // Simulate generation/fetch delay
+    setTimeout(() => {
+      const content = `STRATEGIC REPORT: ${report.name}\nGenerated on: ${new Date().toLocaleString()}\nFile Size: ${report.size}\n\nKey Strategic Insights:\n- Current ROI Multiplier: ${FISCAL_METRICS.currentROI}x\n- Target EBITDA Protection: $${FISCAL_METRICS.vision2028}M\n- Status: VERIFIED AND APPROVED`;
+      
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${report.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      setDownloadingId(null);
+    }, 1500);
+  };
+
   return (
     <div className="flex-1 bg-gray-50 overflow-auto">
       <Header title="Analytics & Reports" subtitle="The Fiscal Foundation: Efficiency vs. Leakage" />
@@ -171,8 +194,8 @@ const Analytics: React.FC = () => {
               <h3 className="font-semibold text-gray-900">Strategic Documentation</h3>
            </div>
            <div className="divide-y divide-gray-100">
-              {reports.map((report, i) => (
-                <div key={i} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+              {reports.map((report) => (
+                <div key={report.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
                    <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
                         <FileText className="w-5 h-5 text-indigo-500" />
@@ -182,8 +205,13 @@ const Analytics: React.FC = () => {
                         <p className="text-xs text-gray-500">{report.date} • {report.size}</p>
                       </div>
                    </div>
-                   <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
-                     <Download className="w-4 h-4" /> Download
+                   <button 
+                     onClick={() => handleDownloadReport(report)}
+                     disabled={downloadingId === report.id}
+                     className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-wait"
+                   >
+                     {downloadingId === report.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                     Download
                    </button>
                 </div>
               ))}
