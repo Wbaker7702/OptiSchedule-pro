@@ -13,6 +13,7 @@ import { View } from './types';
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentView, setCurrentView] = useState<View>(View.DASHBOARD);
+  const [operationsTab, setOperationsTab] = useState<'metrics' | 'audit'>('metrics');
 
   const handleLogin = () => {
     setIsAuthenticated(true);
@@ -23,14 +24,19 @@ const App: React.FC = () => {
     setCurrentView(View.DASHBOARD);
   };
 
+  const navigateToOperations = (tab: 'metrics' | 'audit' = 'metrics') => {
+    setOperationsTab(tab);
+    setCurrentView(View.OPERATIONS);
+  };
+
   const renderView = () => {
     switch (currentView) {
       case View.DASHBOARD:
         return <Dashboard />;
       case View.SCHEDULING:
-        return <Scheduling />;
+        return <Scheduling setCurrentView={setCurrentView} onFinalize={() => navigateToOperations('audit')} />;
       case View.OPERATIONS:
-        return <Operations />;
+        return <Operations defaultTab={operationsTab} />;
       case View.INVENTORY:
         return <Inventory />;
       case View.ANALYTICS:
@@ -52,7 +58,10 @@ const App: React.FC = () => {
     <div className="flex h-screen bg-gray-50">
       <Sidebar 
         currentView={currentView} 
-        setCurrentView={setCurrentView} 
+        setCurrentView={(view) => {
+          if (view !== View.OPERATIONS) setOperationsTab('metrics');
+          setCurrentView(view);
+        }} 
         onLogout={handleLogout}
       />
       <main className="flex-1 ml-64 flex flex-col h-screen">

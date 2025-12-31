@@ -28,17 +28,17 @@ export const FISCAL_METRICS = {
 
 export const OPERATIONAL_AUDITS = [
   { id: 'aud-101', severity: 'error', code: 'POL-01', message: 'Compliance Breach: Variance > 15% in Front End Protocol', file: 'Sector: Alpha-1', fix: 'Deploy Sentinel Protocol' },
-  { id: 'aud-102', severity: 'warning', code: 'SEC-04', message: 'Unauthorized Sync Latency (240ms) - Buffer Threat', file: 'Node: HS_Ingress', fix: 'Purge Sync Cache' },
+  { id: 'aud-102', severity: 'warning', code: 'SEC-04', message: 'Unauthorized Sync Latency (240ms) - Buffer Threat', file: 'Node: D365_Ingress', fix: 'Purge Sync Cache' },
   { id: 'aud-103', severity: 'info', code: 'SSP-09', message: 'Sentinel Security Framework validated for peak load', file: 'Log: Dec_13_2025', fix: 'No action' },
   { id: 'aud-104', severity: 'error', code: 'FIS-02', message: 'Asset Depletion Risk: Critical Inventory Gap', file: 'Vault: Grocery', fix: 'Force Re-stocking' },
   { id: 'aud-105', severity: 'warning', code: 'LAB-02', message: 'Protocol Deviation: 12.5 surplus hrs unallocated', file: 'Sector: Apparel-B', fix: 'Re-deploy Assets' },
 ];
 
-export const HUBSPOT_ROI_DATA = {
-  marketingLeads: { value: 150, label: "Marketing Ingress", subtext: "+150% Verification" },
-  websiteVisitors: { value: 133, label: "Digital Traffic", subtext: "Global Verified Reach" },
-  dealsCreated: { value: 26, label: "Contracts Validated", subtext: "Enterprise Standard" },
-  revenue: { value: 150, label: "Fiscal Growth", subtext: "Security Driven" }
+export const DYNAMICS_365_ROI_DATA = {
+  marketingLeads: { value: 150, label: "Enterprise Ingress", subtext: "+150% Data Precision" },
+  websiteVisitors: { value: 133, label: "Pipeline Velocity", subtext: "Verified Dynamics Flow" },
+  dealsCreated: { value: 26, label: "Opportunties Validated", subtext: "ERP Standard" },
+  revenue: { value: 150, label: "ERP Integration", subtext: "Dynamics 365 Verified" }
 };
 
 export const EMPLOYEES: Employee[] = [

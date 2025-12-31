@@ -54,7 +54,7 @@ breach of system integrity.
 
 4. SECURITY ENGINE (OPERATIONAL INFRASTRUCTURE)
 - Framework: Sentinel Secure Node (Hardened)
-- Sync Frequency: Real-time Sentinel Ingress
+- Sync Frequency: Real-time Dynamics 365 Ingress
 - Audit Engine: Sentinel Linter v3.1 (Enforce Standard)
 
 5. POLICY MANDATE
@@ -95,8 +95,8 @@ Validated by: Sentinel Security Auth Node-5065
     },
     {
       id: 'sync',
-      title: "HS Ingress Node",
-      desc: "Secure link to external marketing and CRM data ingestion.",
+      title: "D365 Ingress Node",
+      desc: "Secure link to Microsoft Dynamics 365 and ERP data ingestion.",
       icon: <Database className="w-5 h-5 text-blue-400" />,
       code: "Sentinel.validate_ingress",
       actionLabel: "Monitor Node",
@@ -189,7 +189,7 @@ Validated by: Sentinel Security Auth Node-5065
                  </p>
                  <div className="flex flex-wrap gap-2">
                     <span className="px-2 py-1 bg-slate-800 border border-slate-700 rounded text-[9px] font-mono font-bold text-slate-400">HARDENED NODE</span>
-                    <span className="px-2 py-1 bg-slate-800 border border-slate-700 rounded text-[9px] font-mono font-bold text-slate-400">SENTINEL INGRESS</span>
+                    <span className="px-2 py-1 bg-slate-800 border border-slate-700 rounded text-[9px] font-mono font-bold text-slate-400">DYNAMICS INGRESS</span>
                     <span className="px-2 py-1 bg-slate-800 border border-slate-700 rounded text-[9px] font-mono font-bold text-slate-400">SHIELD CACHE</span>
                  </div>
 

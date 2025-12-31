@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Header from '../components/Header';
 import { DEPARTMENT_METRICS, OPERATIONAL_AUDITS as INITIAL_AUDITS } from '../constants';
-import { RefreshCcw, Users, DollarSign, TrendingUp, Clock, ShieldAlert, CheckCircle, Info, Terminal, Search, AlertCircle, Play, Download, Loader2 } from 'lucide-react';
+import { RefreshCcw, Users, DollarSign, TrendingUp, Clock, ShieldAlert, CheckCircle, Info, Terminal, Search, AlertCircle, Play, Download, Loader2, ChevronRight, Activity, TerminalSquare } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine, Label } from 'recharts';
 
 const salesData = [
@@ -13,11 +13,74 @@ const salesData = [
   { name: 'Pharmacy', sales: 1350 },
 ];
 
-const Operations: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'metrics' | 'audit'>('metrics');
+interface LinterLog {
+  id: string;
+  timestamp: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+}
+
+interface OperationsProps {
+  defaultTab?: 'metrics' | 'audit';
+}
+
+const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
+  const [activeTab, setActiveTab] = useState<'metrics' | 'audit'>(defaultTab);
   const [audits, setAudits] = useState(INITIAL_AUDITS);
   const [isSyncing, setIsSyncing] = useState(false);
   const [fixingId, setFixingId] = useState<string | null>(null);
+  const [linterLogs, setLinterLogs] = useState<LinterLog[]>([]);
+  const [executionCount, setExecutionCount] = useState(1);
+  const logEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setActiveTab(defaultTab);
+  }, [defaultTab]);
+
+  // Auto-scroll logs
+  useEffect(() => {
+    logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [linterLogs]);
+
+  // Handle entry and logging
+  useEffect(() => {
+    if (activeTab === 'audit') {
+      if (linterLogs.length === 0) {
+        addLog(`[EXECUTION #${executionCount}] Baseline Sentinel diagnostic scan initialized.`, 'info');
+        setTimeout(() => {
+          addLog(`System check complete. ${audits.length} variances found. Integrity Score: 88%.`, 'warning');
+        }, 600);
+      } else if (defaultTab === 'audit') {
+        // Log entry from Schedule Finalization
+        addLog(`Scheduled Ingress Verification initiated. Validating variance against D365 ERP logic.`, 'info');
+      }
+    }
+  }, [activeTab]);
+
+  // Periodic Auto-Linter (Every 45 seconds)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (activeTab === 'audit') {
+        const nextExec = executionCount + 1;
+        setExecutionCount(nextExec);
+        addLog(`[EXECUTION #${nextExec}] Automated periodic background audit started...`, 'info');
+        setTimeout(() => {
+          addLog(`Automated check #${nextExec} complete. No new deviations detected in Sector Alpha.`, 'success');
+        }, 2000);
+      }
+    }, 45000);
+    return () => clearInterval(interval);
+  }, [activeTab, executionCount]);
+
+  const addLog = (message: string, type: LinterLog['type']) => {
+    const newLog: LinterLog = {
+      id: Math.random().toString(36).substr(2, 9),
+      timestamp: new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      message,
+      type
+    };
+    setLinterLogs(prev => [...prev, newLog]);
+  };
 
   const chartData = salesData.map(item => {
     const metric = DEPARTMENT_METRICS.find(d => d.name === item.name);
@@ -32,24 +95,36 @@ const Operations: React.FC = () => {
   const averageSales = totalSales / salesData.length;
 
   const handleQuickFix = (id: string) => {
+    const audit = audits.find(a => a.id === id);
     setFixingId(id);
-    // Simulate a fix process
+    addLog(`Protocol Trigger: Enforcing standard for variance ${audit?.code}.`, 'info');
+    
     setTimeout(() => {
       setAudits(prev => prev.filter(a => a.id !== id));
       setFixingId(null);
+      addLog(`REMEDIATION SUCCESS: ${audit?.code} cleared in real-time.`, 'success');
     }, 800);
   };
 
   const handleFullSync = () => {
+    const nextExec = executionCount + 1;
+    setExecutionCount(nextExec);
     setIsSyncing(true);
-    // Simulate a full system scan/sync
+    addLog(`[EXECUTION #${nextExec}] Manual Full-Scope Linter Sync initiated by user.`, 'info');
+    addLog('Re-indexing Microsoft Dynamics 365 Sales/HR Node endpoints...', 'info');
+    
     setTimeout(() => {
       setIsSyncing(false);
-      // Optional: Logic to "find" new issues or reset the list if desired
+      addLog(`Full Sync #${nextExec} complete. All 5 policy vectors validated.`, 'success');
+      if (audits.length === 0) {
+        setAudits(INITIAL_AUDITS);
+        addLog('Policy deviations detected after node refresh. Manual intervention required.', 'warning');
+      }
     }, 2500);
   };
 
   const handleExportCSV = () => {
+    addLog('Sentinel Ledger Export: Generating secure binary buffer...', 'info');
     const headers = ['ID', 'Severity', 'Code', 'Message', 'Entity', 'Fix Action'];
     const rows = audits.map(a => [
       a.id,
@@ -69,6 +144,7 @@ const Operations: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    addLog('Export successful. Ledger downloaded to local client storage.', 'success');
   };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -259,126 +335,180 @@ const Operations: React.FC = () => {
             </div>
           </>
         ) : (
-          <div className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden animate-in fade-in duration-500">
-             <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                <div className="flex items-center gap-4">
-                   <div className="p-2 bg-blue-600 rounded-lg">
-                      <Terminal className="w-5 h-5 text-white" />
-                   </div>
-                   <div>
-                      <h3 className="text-white font-bold">Operational Linter v3.0</h3>
-                      <p className="text-slate-400 text-xs mt-0.5 font-mono">Auditing Store 5065 Live Performance...</p>
-                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                   <div className="bg-slate-800 rounded-lg p-1.5 flex items-center gap-2">
-                      <div className="flex items-center gap-1 text-[10px] font-bold px-2 text-red-400 border-r border-slate-700">
-                         <AlertCircle className="w-3 h-3" /> {audits.filter(a => a.severity === 'error').length} ERRORS
-                      </div>
-                      <div className="flex items-center gap-1 text-[10px] font-bold px-2 text-orange-400 border-r border-slate-700">
-                         <Info className="w-3 h-3" /> {audits.filter(a => a.severity === 'warning').length} WARN
-                      </div>
-                      <div className="flex items-center gap-1 text-[10px] font-bold px-2 text-blue-400">
-                         <CheckCircle className="w-3 h-3" /> {INITIAL_AUDITS.length - audits.length + audits.filter(a => a.severity === 'info').length} OK
-                      </div>
-                   </div>
-                </div>
-             </div>
-             
-             <div className="p-0 min-h-[300px] relative">
-                {isSyncing && (
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-20 flex flex-col items-center justify-center text-white">
-                        <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-                        <p className="font-mono text-sm tracking-widest uppercase animate-pulse">Running Full System Sync...</p>
+          <div className="space-y-6 animate-in fade-in duration-500">
+             <div className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+                    <div className="flex items-center gap-4">
+                    <div className="p-2 bg-blue-600 rounded-lg">
+                        <Terminal className="w-5 h-5 text-white" />
                     </div>
-                )}
-                <table className="w-full text-left font-mono">
-                   <thead className="bg-slate-800/30 text-slate-500 text-[10px] uppercase tracking-widest border-b border-slate-800">
-                      <tr>
-                         <th className="px-6 py-3">Severity</th>
-                         <th className="px-6 py-3">Audit Code</th>
-                         <th className="px-6 py-3">Diagnostic Message</th>
-                         <th className="px-6 py-3">Source Entity</th>
-                         <th className="px-6 py-3 text-right">Quick Fix</th>
-                      </tr>
-                   </thead>
-                   <tbody className="divide-y divide-slate-800/50">
-                      {audits.length > 0 ? (
-                        audits.map((audit) => (
-                            <tr key={audit.id} className="hover:bg-slate-800/20 group transition-colors">
-                               <td className="px-6 py-4">
-                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                                     audit.severity === 'error' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                                     audit.severity === 'warning' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
-                                     'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                                  }`}>
-                                     {audit.severity}
-                                  </span>
-                               </td>
-                               <td className="px-6 py-4 text-slate-300 text-xs">{audit.code}</td>
-                               <td className="px-6 py-4 text-white text-xs font-medium">{audit.message}</td>
-                               <td className="px-6 py-4 text-slate-500 text-xs italic">{audit.file}</td>
-                               <td className="px-6 py-4 text-right">
-                                  {audit.fix !== 'No action' ? (
-                                     <button 
-                                        onClick={() => handleQuickFix(audit.id)}
-                                        disabled={fixingId === audit.id}
-                                        className="text-blue-400 hover:text-white flex items-center gap-1.5 text-[10px] font-bold ml-auto bg-blue-500/10 px-3 py-1 rounded-md border border-blue-500/20 hover:bg-blue-500/30 transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-                                     >
-                                        {fixingId === audit.id ? (
-                                            <>
-                                                <Loader2 className="w-3 h-3 animate-spin" /> Fixing...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Play className="w-3 h-3" /> {audit.fix}
-                                            </>
-                                        )}
-                                     </button>
-                                  ) : (
-                                     <span className="text-slate-600 text-[10px]">VERIFIED</span>
-                                  )}
-                               </td>
-                            </tr>
-                        ))
-                      ) : (
+                    <div>
+                        <h3 className="text-white font-bold">Operational Linter v3.0</h3>
+                        <p className="text-slate-400 text-xs mt-0.5 font-mono">Auditing Store 5065 Live Performance...</p>
+                    </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                    <div className="bg-slate-800 rounded-lg p-1.5 flex items-center gap-2">
+                        <div className="flex items-center gap-1 text-[10px] font-bold px-2 text-red-400 border-r border-slate-700">
+                            <AlertCircle className="w-3 h-3" /> {audits.filter(a => a.severity === 'error').length} ERRORS
+                        </div>
+                        <div className="flex items-center gap-1 text-[10px] font-bold px-2 text-orange-400 border-r border-slate-700">
+                            <Info className="w-3 h-3" /> {audits.filter(a => a.severity === 'warning').length} WARN
+                        </div>
+                        <div className="flex items-center gap-1 text-[10px] font-bold px-2 text-blue-400">
+                            <CheckCircle className="w-3 h-3" /> {INITIAL_AUDITS.length - audits.length + audits.filter(a => a.severity === 'info').length} OK
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                
+                <div className="p-0 min-h-[300px] relative">
+                    {isSyncing && (
+                        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-20 flex flex-col items-center justify-center text-white">
+                            <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+                            <p className="font-mono text-sm tracking-widest uppercase animate-pulse">Running Full System Sync...</p>
+                        </div>
+                    )}
+                    <table className="w-full text-left font-mono">
+                    <thead className="bg-slate-800/30 text-slate-500 text-[10px] uppercase tracking-widest border-b border-slate-800">
                         <tr>
-                            <td colSpan={5} className="px-6 py-20 text-center">
-                                <div className="flex flex-col items-center">
-                                    <CheckCircle className="w-12 h-12 text-emerald-500 mb-4 opacity-20" />
-                                    <p className="text-slate-500 text-sm tracking-wide">No active linting errors. System clean.</p>
-                                    <button 
-                                        onClick={() => setAudits(INITIAL_AUDITS)}
-                                        className="mt-4 text-blue-500 hover:text-blue-400 text-xs font-bold"
-                                    >
-                                        Reset Audit Log
-                                    </button>
-                                </div>
-                            </td>
+                            <th className="px-6 py-3">Severity</th>
+                            <th className="px-6 py-3">Audit Code</th>
+                            <th className="px-6 py-3">Diagnostic Message</th>
+                            <th className="px-6 py-3">Source Entity</th>
+                            <th className="px-6 py-3 text-right">Quick Fix</th>
                         </tr>
-                      )}
-                   </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/50">
+                        {audits.length > 0 ? (
+                            audits.map((audit) => (
+                                <tr key={audit.id} className="hover:bg-slate-800/20 group transition-colors">
+                                <td className="px-6 py-4">
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                        audit.severity === 'error' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                                        audit.severity === 'warning' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
+                                        'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                    }`}>
+                                        {audit.severity}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 text-slate-300 text-xs">{audit.code}</td>
+                                <td className="px-6 py-4 text-white text-xs font-medium">{audit.message}</td>
+                                <td className="px-6 py-4 text-slate-500 text-xs italic">{audit.file}</td>
+                                <td className="px-6 py-4 text-right">
+                                    {audit.fix !== 'No action' ? (
+                                        <button 
+                                            onClick={() => handleQuickFix(audit.id)}
+                                            disabled={fixingId === audit.id}
+                                            className="text-blue-400 hover:text-white flex items-center gap-1.5 text-[10px] font-bold ml-auto bg-blue-500/10 px-3 py-1 rounded-md border border-blue-500/20 hover:bg-blue-500/30 transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {fixingId === audit.id ? (
+                                                <>
+                                                    <Loader2 className="w-3 h-3 animate-spin" /> Fixing...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Play className="w-3 h-3" /> {audit.fix}
+                                                </>
+                                            )}
+                                        </button>
+                                    ) : (
+                                        <span className="text-slate-600 text-[10px]">VERIFIED</span>
+                                    )}
+                                </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={5} className="px-6 py-20 text-center">
+                                    <div className="flex flex-col items-center">
+                                        <CheckCircle className="w-12 h-12 text-emerald-500 mb-4 opacity-20" />
+                                        <p className="text-slate-500 text-sm tracking-wide">No active linting errors. System clean.</p>
+                                        <button 
+                                            onClick={() => {
+                                                setAudits(INITIAL_AUDITS);
+                                                addLog('Sentinel Ledger: Audit log reset manually.', 'info');
+                                            }}
+                                            className="mt-4 text-blue-500 hover:text-blue-400 text-xs font-bold"
+                                        >
+                                            Reset Audit Log
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                    </table>
+                </div>
+
+                <div className="p-4 bg-slate-800/30 border-t border-slate-800 flex justify-between items-center">
+                    <p className="text-[10px] text-slate-500">Scan Complete: Dec 13, 2025 • {isSyncing ? '...' : '0.04s'} Execution Time</p>
+                    <div className="flex gap-2">
+                    <button 
+                        onClick={handleExportCSV}
+                        disabled={audits.length === 0}
+                        className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white text-xs rounded transition-colors border border-slate-600 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <Download className="w-3 h-3" /> Export Audit CSV
+                    </button>
+                    <button 
+                        onClick={handleFullSync}
+                        disabled={isSyncing}
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded transition-colors font-bold shadow-lg shadow-blue-500/20 flex items-center gap-2 disabled:opacity-50"
+                    >
+                        {isSyncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCcw className="w-3 h-3" />}
+                        Run Full System Sync
+                    </button>
+                    </div>
+                </div>
              </div>
 
-             <div className="p-4 bg-slate-800/30 border-t border-slate-800 flex justify-between items-center">
-                <p className="text-[10px] text-slate-500">Scan Complete: Dec 13, 2025 • {isSyncing ? '...' : '0.04s'} Execution Time</p>
-                <div className="flex gap-2">
-                   <button 
-                    onClick={handleExportCSV}
-                    disabled={audits.length === 0}
-                    className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white text-xs rounded transition-colors border border-slate-600 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                   >
-                     <Download className="w-3 h-3" /> Export Audit CSV
-                   </button>
-                   <button 
-                    onClick={handleFullSync}
-                    disabled={isSyncing}
-                    className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded transition-colors font-bold shadow-lg shadow-blue-500/20 flex items-center gap-2 disabled:opacity-50"
-                   >
-                     {isSyncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCcw className="w-3 h-3" />}
-                     Run Full System Sync
-                   </button>
+             {/* Linter Activity Stream */}
+             <div className="bg-slate-950 rounded-2xl border border-slate-800 shadow-xl overflow-hidden flex flex-col">
+                <div className="px-6 py-3 border-b border-slate-800 bg-slate-900/30 flex items-center justify-between">
+                   <div className="flex items-center gap-2">
+                      <TerminalSquare className="w-4 h-4 text-emerald-500" />
+                      <h4 className="text-white text-[10px] font-black uppercase tracking-widest">Sentinel Activity Feed</h4>
+                   </div>
+                   <div className="flex items-center gap-3">
+                      <div className="bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-[9px] font-mono text-slate-500">EXEC_ID: {executionCount.toString().padStart(4, '0')}</div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[9px] text-emerald-500 font-mono font-bold uppercase tracking-widest">Bridging Active</span>
+                      </div>
+                   </div>
+                </div>
+                <div className="h-44 overflow-y-auto p-4 font-mono text-[11px] custom-scrollbar bg-[#020617] selection:bg-blue-500/30">
+                   <div className="space-y-1.5">
+                      {linterLogs.map((log) => (
+                        <div key={log.id} className="flex gap-3 animate-in fade-in slide-in-from-bottom-1 duration-300 group">
+                           <span className="text-slate-600 shrink-0 font-bold">[{log.timestamp}]</span>
+                           <div className="flex items-start gap-2">
+                              <ChevronRight className={`w-3 h-3 mt-0.5 ${
+                                 log.type === 'error' ? 'text-red-500' :
+                                 log.type === 'warning' ? 'text-orange-500' :
+                                 log.type === 'success' ? 'text-emerald-500' : 'text-blue-500'
+                              }`} />
+                              <span className={`leading-relaxed ${
+                                 log.type === 'error' ? 'text-red-400 font-bold' :
+                                 log.type === 'warning' ? 'text-orange-300' :
+                                 log.type === 'success' ? 'text-emerald-400' : 'text-slate-300'
+                              }`}>
+                                 {log.message}
+                              </span>
+                           </div>
+                        </div>
+                      ))}
+                      {linterLogs.length === 0 && (
+                        <div className="text-slate-700 italic flex items-center gap-2">
+                          <Loader2 className="w-3 h-3 animate-spin" /> Initializing Activity Bridge...
+                        </div>
+                      )}
+                      <div ref={logEndRef} />
+                   </div>
+                </div>
+                <div className="px-6 py-2 bg-slate-900/50 border-t border-slate-800 flex justify-end">
+                    <span className="text-[8px] font-mono text-slate-600 uppercase tracking-widest">Authorized Access Only • AES-256 Encrypted Stream</span>
                 </div>
              </div>
           </div>

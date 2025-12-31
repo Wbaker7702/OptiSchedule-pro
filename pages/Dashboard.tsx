@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import StatCard from '../components/StatCard';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { CheckCircle2, Clock, ShieldAlert, ShieldCheck, Scale, TrendingUp, Zap, Database, Activity, Terminal, Server, Globe, Lock } from 'lucide-react';
-import { DATE_STRING, FISCAL_METRICS, APP_VERSION, HUBSPOT_ROI_DATA } from '../constants';
+import { CheckCircle2, Clock, ShieldAlert, ShieldCheck, Scale, TrendingUp, Zap, Database, Activity, Terminal, Server, Globe, Lock, RefreshCw, AlertTriangle, Loader2 } from 'lucide-react';
+import { DATE_STRING, FISCAL_METRICS, APP_VERSION, DYNAMICS_365_ROI_DATA } from '../constants';
 
 const data = [
   { time: '8 AM', value: 40 },
@@ -17,15 +17,24 @@ const data = [
 
 const Dashboard: React.FC = () => {
   const [pulseLogs, setPulseLogs] = useState<{id: number, msg: string, time: string}[]>([]);
+  const [complianceScore, setComplianceScore] = useState(90);
+  const [isOptimizing, setIsOptimizing] = useState(false);
+  const [lastOptimized, setLastOptimized] = useState<string | null>(null);
+  
+  const [subMetrics, setSubMetrics] = useState({
+    enforcement: 94,
+    sync: 99.8,
+    audit: 100
+  });
 
   useEffect(() => {
     const messages = [
       "SENTINEL_AUTH: Verification Sector Alpha",
-      "HS_INGRESS: Data Packet Validated",
+      "D365_INGRESS: Data Packet Validated",
       "LINTER: Breach remediated Node-5065",
       "SYNC: Sub-millisecond latency locked",
       "SSP: Sentinel Security Frame v3.1 active",
-      "AUDIT: Compliance Rating 100%"
+      "AUDIT: ERP Compliance Rating 100%"
     ];
     
     const interval = setInterval(() => {
@@ -39,6 +48,39 @@ const Dashboard: React.FC = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  const handleOptimizeProtocol = () => {
+    setIsOptimizing(true);
+    // Log the start of optimization
+    const startTime = new Date().toLocaleTimeString();
+    setPulseLogs(prev => [{
+      id: Date.now(),
+      msg: "SENTINEL_OPTIMIZE: Hardening all sector protocols...",
+      time: startTime
+    }, ...prev].slice(0, 5));
+
+    setTimeout(() => {
+      const newScore = Math.floor(Math.random() * (100 - 97 + 1)) + 97;
+      setComplianceScore(newScore);
+      setSubMetrics({
+        enforcement: 99,
+        sync: 100,
+        audit: 100
+      });
+      setLastOptimized(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      setIsOptimizing(false);
+      
+      setPulseLogs(prev => [{
+        id: Date.now() + 1,
+        msg: `SENTINEL_SUCCESS: Compliance score restored to ${newScore}%`,
+        time: new Date().toLocaleTimeString()
+      }, ...prev].slice(0, 5));
+    }, 2000);
+  };
+
+  // 364.4 is the circumference for R=58 (2 * PI * 58)
+  const circumference = 364.4;
+  const offset = circumference - (complianceScore / 100) * circumference;
 
   return (
     <div className="flex-1 bg-slate-950 overflow-auto">
@@ -81,12 +123,12 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
             <StatCard 
-              title="Marketing Ingress" 
-              value={`${HUBSPOT_ROI_DATA.marketingLeads.value}%`} 
+              title="Enterprise Ingress" 
+              value={`${DYNAMICS_365_ROI_DATA.marketingLeads.value}%`} 
               trend="+12%" 
               trendDirection="up" 
-              subtitle="HubSpot Authorized"
-              icon={<Zap className="w-5 h-5 text-blue-500" />}
+              subtitle="Dynamics 365 Verified"
+              icon={<Database className="w-5 h-5 text-blue-500" />}
             />
             <StatCard 
               title="Resource Recapture" 
@@ -155,34 +197,86 @@ const Dashboard: React.FC = () => {
              </div>
            </div>
 
-           <div className="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 p-6 space-y-4">
-              <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                Sentinel Compliance
-              </h3>
-              <div className="flex items-center justify-center p-8">
+           {/* Sentinel Compliance Card */}
+           <div className="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 p-6 space-y-4 flex flex-col">
+              <div className="flex justify-between items-start">
+                 <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
+                    <ShieldCheck className={`w-4 h-4 ${complianceScore >= 97 ? 'text-emerald-500' : 'text-amber-500'}`} />
+                    Sentinel Compliance
+                 </h3>
+                 {complianceScore < 97 && !isOptimizing && (
+                    <div className="flex items-center gap-1 animate-pulse">
+                       <AlertTriangle className="w-3 h-3 text-amber-500" />
+                       <span className="text-[8px] font-black text-amber-500 uppercase">Drift Detected</span>
+                    </div>
+                 )}
+              </div>
+              
+              <div className="flex items-center justify-center py-4 relative">
                  <div className="relative">
-                    <svg className="w-32 h-32 transform -rotate-90">
+                    <svg className="w-32 h-32 transform -rotate-90 transition-all duration-1000">
                        <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="10" fill="transparent" className="text-slate-800" />
-                       <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="10" fill="transparent" strokeDasharray={364.4} strokeDashoffset={36.4} className="text-blue-500 rounded-full" />
+                       <circle 
+                        cx="64" 
+                        cy="64" 
+                        r="58" 
+                        stroke="currentColor" 
+                        strokeWidth="10" 
+                        fill="transparent" 
+                        strokeDasharray={circumference} 
+                        strokeDashoffset={offset} 
+                        className={`transition-all duration-1000 rounded-full ${complianceScore >= 97 ? 'text-emerald-500' : 'text-blue-500'}`} 
+                       />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                       <span className="text-2xl font-black text-white tracking-tighter">90%</span>
-                       <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Sentinel Grade</span>
+                       <span className={`text-2xl font-black tracking-tighter transition-colors duration-1000 ${complianceScore >= 97 ? 'text-white' : 'text-blue-400'}`}>
+                          {isOptimizing ? '---' : `${complianceScore}%`}
+                       </span>
+                       <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Grade</span>
                     </div>
                  </div>
               </div>
-              <div className="space-y-3 pt-2">
+
+              <div className="space-y-3 pt-2 flex-1">
                  {[
-                   {label: "Policy Enforcement", val: "94%"},
-                   {label: "Sentinel Sync", val: "99.8%"},
-                   {label: "Audit Coverage", val: "100%"}
+                   {label: "Policy Enforcement", val: `${subMetrics.enforcement}%`},
+                   {label: "Dynamics Sync", val: `${subMetrics.sync}%`},
+                   {label: "Audit Coverage", val: `${subMetrics.audit}%`}
                  ].map(item => (
                     <div key={item.label} className="flex justify-between items-center bg-slate-950 p-2 rounded-lg border border-slate-800">
                        <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{item.label}</span>
-                       <span className="text-[10px] font-black text-white">{item.val}</span>
+                       <span className="text-[10px] font-black text-white font-mono">{item.val}</span>
                     </div>
                  ))}
+              </div>
+
+              <div className="pt-4 border-t border-slate-800">
+                 <button 
+                  onClick={handleOptimizeProtocol}
+                  disabled={isOptimizing || complianceScore >= 99}
+                  className={`w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 ${
+                    complianceScore >= 97 
+                    ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 cursor-default' 
+                    : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/20'
+                  } disabled:opacity-75`}
+                 >
+                   {isOptimizing ? (
+                     <>
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Hardening Protocol...
+                     </>
+                   ) : complianceScore >= 97 ? (
+                     <>
+                        <ShieldCheck className="w-3 h-3" />
+                        Standard Hardened {lastOptimized && `[${lastOptimized}]`}
+                     </>
+                   ) : (
+                     <>
+                        <RefreshCw className="w-3 h-3" />
+                        Fix Protocol Deviation
+                     </>
+                   )}
+                 </button>
               </div>
            </div>
         </div>
