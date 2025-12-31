@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { LayoutDashboard, CalendarDays, Activity, Package, BarChart3, Users, Settings, LogOut, ShieldCheck, Lock } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, Activity, Package, BarChart3, Users, Settings as SettingsIcon, LogOut, ShieldCheck, Lock } from 'lucide-react';
 import { View } from '../types';
 import { APP_VERSION, BRAND_NAME } from '../constants';
 
@@ -56,8 +57,15 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, onLogout
            <ShieldCheck className="w-3 h-3 text-blue-400" />
            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">{APP_VERSION}</span>
         </div>
-        <button className="flex items-center gap-3 px-4 py-2 text-slate-400 hover:text-white w-full rounded-lg hover:bg-slate-800 transition-colors">
-          <Settings className="w-4 h-4" />
+        <button 
+          onClick={() => setCurrentView(View.SETTINGS)}
+          className={`flex items-center gap-3 px-4 py-2 w-full rounded-lg transition-all group ${
+            currentView === View.SETTINGS 
+              ? 'bg-slate-800 text-white border border-slate-700' 
+              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+          }`}
+        >
+          <SettingsIcon className={`w-4 h-4 ${currentView === View.SETTINGS ? 'text-blue-500' : ''}`} />
           <span className="text-xs font-bold uppercase tracking-widest">Settings</span>
         </button>
         <button 

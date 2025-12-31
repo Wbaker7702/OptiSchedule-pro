@@ -3,7 +3,7 @@ import { Employee, Product, HeatmapDataPoint, DepartmentMetric } from './types';
 export const CURRENT_USER = "Wesley Baker";
 export const STORE_NUMBER = "5065";
 export const DATE_STRING = "Saturday, December 13, 2025";
-export const APP_VERSION = "v3.1.0-Sentinel-Core";
+export const APP_VERSION = "v3.2.0-Sentinel-Hub";
 export const BRAND_NAME = "OptiSchedule Pro";
 
 export const SYSTEM_HEALTH = {
@@ -15,24 +15,30 @@ export const SYSTEM_HEALTH = {
   syncCycle: 'Real-time (SSP Enabled)'
 };
 
-// Metrics derived from "The Scaling Formula" & "Sentinel Security Policy"
 export const FISCAL_METRICS = {
   avgPayRate: 14.00,
   targetWeeklyHoursRecapture: 186,
-  executionLeakage: 90000, // Per week in "Execution Leakage"
-  currentROI: 10.3, // "For every $1 invested we protect $10.30"
-  annualRecoveryTarget: 4.68, // Millions
-  vision2028: 491, // Millions (Enterprise Opportunity)
-  laborSurplusPct: 15, // "Identifying a 15% labor surplus"
+  executionLeakage: 90000,
+  currentROI: 10.3,
+  annualRecoveryTarget: 4.68,
+  vision2028: 491,
+  laborSurplusPct: 15,
 };
 
 export const OPERATIONAL_AUDITS = [
-  { id: 'aud-101', severity: 'error', code: 'POL-01', message: 'Compliance Breach: Variance > 15% in Front End Protocol', file: 'Sector: Alpha-1', fix: 'Deploy Sentinel Protocol' },
+  { id: 'aud-101', severity: 'error', code: 'POL-01', message: 'Compliance Breach: Variance > 15% in Front End Protocol', file: 'Dept: Front End', fix: 'Deploy Sentinel Protocol' },
   { id: 'aud-102', severity: 'warning', code: 'SEC-04', message: 'Unauthorized Sync Latency (240ms) - Buffer Threat', file: 'Node: D365_Ingress', fix: 'Purge Sync Cache' },
   { id: 'aud-103', severity: 'info', code: 'SSP-09', message: 'Sentinel Security Framework validated for peak load', file: 'Log: Dec_13_2025', fix: 'No action' },
-  { id: 'aud-104', severity: 'error', code: 'FIS-02', message: 'Asset Depletion Risk: Critical Inventory Gap', file: 'Vault: Grocery', fix: 'Force Re-stocking' },
-  { id: 'aud-105', severity: 'warning', code: 'LAB-02', message: 'Protocol Deviation: 12.5 surplus hrs unallocated', file: 'Sector: Apparel-B', fix: 'Re-deploy Assets' },
+  { id: 'aud-104', severity: 'error', code: 'FIS-02', message: 'Asset Depletion Risk: Critical Inventory Gap', file: 'Dept: Grocery', fix: 'Force Re-stocking' },
+  { id: 'aud-105', severity: 'warning', code: 'LAB-02', message: 'Protocol Deviation: 12.5 surplus hrs unallocated', file: 'Dept: Apparel', fix: 'Re-deploy Assets' },
 ];
+
+export const HUBSPOT_METRICS = {
+  activeCampaigns: 4,
+  loyaltySignups: 1250,
+  attributedRevenue: 15400,
+  syncStatus: 'Disconnected'
+};
 
 export const DYNAMICS_365_ROI_DATA = {
   marketingLeads: { value: 150, label: "Enterprise Ingress", subtext: "+150% Data Precision" },
@@ -56,7 +62,7 @@ export const EMPLOYEES: Employee[] = [
   { id: '12', name: 'Dwight Schrute', role: 'Director of Compliance', department: 'Operations', status: 'Active', performance: 5.0, email: 'dwight.s@optischedule.com', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop' },
   { id: '13', name: 'Jim Halpert', role: 'Strategy Analyst', department: 'Home Goods', status: 'Active', performance: 4.5, email: 'jim.h@optischedule.com', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop' },
   { id: '14', name: 'Stanley Hudson', role: 'Efficiency Agent', department: 'Apparel', status: 'Active', performance: 3.2, email: 'stanley.h@optischedule.com', avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&h=100&fit=crop' },
-  { id: '15', name: 'Angela Martin', role: 'Audit Specialist', department: 'Back Office', status: 'Active', performance: 4.8, email: 'angela.m@optischedule.com', avatar: 'https://images.unsplash.com/photo-1554151228-14d9def656e4?w=100&h=100&fit=crop' },
+  { id: '15', name: 'Angela Martin', role: 'Audit Specialist', department: 'Pharmacy', status: 'Active', performance: 4.8, email: 'angela.m@optischedule.com', avatar: 'https://images.unsplash.com/photo-1554151228-14d9def656e4?w=100&h=100&fit=crop' },
 ];
 
 export const INVENTORY_DATA: Product[] = [
@@ -87,50 +93,50 @@ export const HEATMAP_DATA: HeatmapDataPoint[] = [
 
 export const DEPARTMENT_METRICS: DepartmentMetric[] = [
   { 
-    name: 'Sector Alpha', 
+    name: 'Front End', 
     activeStaff: '12/15', 
     sales: '$42,350', 
-    extraMetricLabel: 'Protocol Compliance', 
+    extraMetricLabel: 'Queue Optimization', 
     extraMetricValue: '94%',
     waitTime: '3m 12s' 
   },
   { 
-    name: 'Node Echo', 
+    name: 'Electronics', 
     activeStaff: '4/5', 
     sales: '$28,920', 
-    extraMetricLabel: 'Security Attach', 
+    extraMetricLabel: 'High-Ticket Ingress', 
     extraMetricValue: '28%',
     waitTime: '5m 45s' 
   },
   { 
-    name: 'Sector Gamma', 
+    name: 'Grocery', 
     activeStaff: '8/10', 
     sales: '$31,680', 
-    extraMetricLabel: 'Vault Integrity', 
+    extraMetricLabel: 'Freshness Index', 
     extraMetricValue: '88%',
     waitTime: '1m 30s'
   },
   { 
-    name: 'Sector Delta', 
+    name: 'Apparel', 
     activeStaff: '3/4', 
     sales: '$15,240', 
-    extraMetricLabel: 'Asset Recovery', 
+    extraMetricLabel: 'Style Integrity', 
     extraMetricValue: '92%',
     waitTime: '4m 15s'
   },
   { 
-    name: 'Node Beta', 
+    name: 'Home Goods', 
     activeStaff: '2/3', 
     sales: '$5,890', 
-    extraMetricLabel: 'Risk Returns', 
-    extraMetricValue: '2.4%',
+    extraMetricLabel: 'Display Fidelity', 
+    extraMetricValue: '98%',
     waitTime: '2m 50s'
   },
   { 
-    name: 'Node Phi', 
+    name: 'Pharmacy', 
     activeStaff: '2/2', 
     sales: '$1,350', 
-    extraMetricLabel: 'Clearance Rate', 
+    extraMetricLabel: 'Fill Velocity', 
     extraMetricValue: '142',
     waitTime: '8m 20s'
   },

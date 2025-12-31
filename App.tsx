@@ -7,13 +7,15 @@ import Inventory from './pages/Inventory';
 import Team from './pages/Team';
 import Analytics from './pages/Analytics';
 import Playbook from './pages/Playbook';
+import Settings from './pages/Settings';
 import Login from './components/Login';
+import SentinelAI from './components/SentinelAI';
 import { View } from './types';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentView, setCurrentView] = useState<View>(View.DASHBOARD);
-  const [operationsTab, setOperationsTab] = useState<'metrics' | 'audit'>('metrics');
+  const [operationsTab, setOperationsTab] = useState<'metrics' | 'audit' | 'vision'>('metrics');
 
   const handleLogin = () => {
     setIsAuthenticated(true);
@@ -24,7 +26,7 @@ const App: React.FC = () => {
     setCurrentView(View.DASHBOARD);
   };
 
-  const navigateToOperations = (tab: 'metrics' | 'audit' = 'metrics') => {
+  const navigateToOperations = (tab: 'metrics' | 'audit' | 'vision' = 'metrics') => {
     setOperationsTab(tab);
     setCurrentView(View.OPERATIONS);
   };
@@ -45,6 +47,8 @@ const App: React.FC = () => {
         return <Team />;
       case View.PLAYBOOK:
         return <Playbook setCurrentView={setCurrentView} />;
+      case View.SETTINGS:
+        return <Settings />;
       default:
         return <Dashboard />;
     }
@@ -64,8 +68,9 @@ const App: React.FC = () => {
         }} 
         onLogout={handleLogout}
       />
-      <main className="flex-1 ml-64 flex flex-col h-screen">
+      <main className="flex-1 ml-64 flex flex-col h-screen relative">
         {renderView()}
+        <SentinelAI />
       </main>
     </div>
   );

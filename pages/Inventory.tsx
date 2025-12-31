@@ -5,7 +5,7 @@ import { Plus, Search, Filter, AlertTriangle, CheckCircle } from 'lucide-react';
 
 const Inventory: React.FC = () => {
   return (
-    <div className="flex-1 bg-gray-50 overflow-auto">
+    <div className="flex-1 bg-gray-50 overflow-auto text-gray-900">
       <Header title="Inventory Management" subtitle="Track stock levels, orders, and quality control" />
       
       <div className="p-8 max-w-7xl mx-auto space-y-6">
@@ -36,7 +36,7 @@ const Inventory: React.FC = () => {
               <div className="flex items-center gap-3">
                  <div className="relative">
                     <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-                    <input type="text" placeholder="Search products..." className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="text" placeholder="Search products..." className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-400" />
                  </div>
                  <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
                     <Filter className="w-4 h-4" /> Filter

@@ -29,9 +29,9 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const messages = [
-      "SENTINEL_AUTH: Verification Sector Alpha",
+      "SENTINEL_AUTH: Verification Front End",
       "D365_INGRESS: Data Packet Validated",
-      "LINTER: Breach remediated Node-5065",
+      "LINTER: Breach remediated Pharmacy",
       "SYNC: Sub-millisecond latency locked",
       "SSP: Sentinel Security Frame v3.1 active",
       "AUDIT: ERP Compliance Rating 100%"
@@ -55,7 +55,7 @@ const Dashboard: React.FC = () => {
     const startTime = new Date().toLocaleTimeString();
     setPulseLogs(prev => [{
       id: Date.now(),
-      msg: "SENTINEL_OPTIMIZE: Hardening all sector protocols...",
+      msg: "SENTINEL_OPTIMIZE: Hardening all floor protocols...",
       time: startTime
     }, ...prev].slice(0, 5));
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '../components/Header';
 import { DEPARTMENT_METRICS, OPERATIONAL_AUDITS as INITIAL_AUDITS } from '../constants';
-import { RefreshCcw, Users, DollarSign, TrendingUp, Clock, ShieldAlert, CheckCircle, Info, Terminal, Search, AlertCircle, Play, Download, Loader2, ChevronRight, Activity, TerminalSquare } from 'lucide-react';
+import { RefreshCcw, Users, DollarSign, TrendingUp, Clock, ShieldAlert, CheckCircle, Info, Terminal, Search, AlertCircle, Play, Download, Loader2, ChevronRight, Activity, TerminalSquare, Eye, Maximize2, Radio } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine, Label } from 'recharts';
 
 const salesData = [
@@ -21,11 +21,11 @@ interface LinterLog {
 }
 
 interface OperationsProps {
-  defaultTab?: 'metrics' | 'audit';
+  defaultTab?: 'metrics' | 'audit' | 'vision';
 }
 
 const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
-  const [activeTab, setActiveTab] = useState<'metrics' | 'audit'>(defaultTab);
+  const [activeTab, setActiveTab] = useState<'metrics' | 'audit' | 'vision'>(defaultTab);
   const [audits, setAudits] = useState(INITIAL_AUDITS);
   const [isSyncing, setIsSyncing] = useState(false);
   const [fixingId, setFixingId] = useState<string | null>(null);
@@ -33,16 +33,17 @@ const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
   const [executionCount, setExecutionCount] = useState(1);
   const logEndRef = useRef<HTMLDivElement>(null);
 
+  // Vision state
+  const [activeCamera, setActiveCamera] = useState('CAM_01_CHECKOUT');
+
   useEffect(() => {
     setActiveTab(defaultTab);
   }, [defaultTab]);
 
-  // Auto-scroll logs
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [linterLogs]);
 
-  // Handle entry and logging
   useEffect(() => {
     if (activeTab === 'audit') {
       if (linterLogs.length === 0) {
@@ -50,14 +51,14 @@ const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
         setTimeout(() => {
           addLog(`System check complete. ${audits.length} variances found. Integrity Score: 88%.`, 'warning');
         }, 600);
-      } else if (defaultTab === 'audit') {
-        // Log entry from Schedule Finalization
-        addLog(`Scheduled Ingress Verification initiated. Validating variance against D365 ERP logic.`, 'info');
       }
+    }
+    if (activeTab === 'vision') {
+        addLog(`Sentinel Floor Vision link established. Authenticating stream for ${activeCamera}...`, 'info');
+        setTimeout(() => addLog(`Stream secure. Real-time telemetry overlay active.`, 'success'), 1200);
     }
   }, [activeTab]);
 
-  // Periodic Auto-Linter (Every 45 seconds)
   useEffect(() => {
     const interval = setInterval(() => {
       if (activeTab === 'audit') {
@@ -65,7 +66,7 @@ const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
         setExecutionCount(nextExec);
         addLog(`[EXECUTION #${nextExec}] Automated periodic background audit started...`, 'info');
         setTimeout(() => {
-          addLog(`Automated check #${nextExec} complete. No new deviations detected in Sector Alpha.`, 'success');
+          addLog(`Automated check #${nextExec} complete. No new deviations detected.`, 'success');
         }, 2000);
       }
     }, 45000);
@@ -81,18 +82,6 @@ const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
     };
     setLinterLogs(prev => [...prev, newLog]);
   };
-
-  const chartData = salesData.map(item => {
-    const metric = DEPARTMENT_METRICS.find(d => d.name === item.name);
-    return {
-      ...item,
-      activeStaff: metric ? metric.activeStaff : 'N/A',
-      waitTime: metric ? metric.waitTime : 'N/A'
-    };
-  });
-
-  const totalSales = salesData.reduce((acc, curr) => acc + curr.sales, 0);
-  const averageSales = totalSales / salesData.length;
 
   const handleQuickFix = (id: string) => {
     const audit = audits.find(a => a.id === id);
@@ -110,72 +99,17 @@ const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
     const nextExec = executionCount + 1;
     setExecutionCount(nextExec);
     setIsSyncing(true);
-    addLog(`[EXECUTION #${nextExec}] Manual Full-Scope Linter Sync initiated by user.`, 'info');
-    addLog('Re-indexing Microsoft Dynamics 365 Sales/HR Node endpoints...', 'info');
+    addLog(`[EXECUTION #${nextExec}] Manual Full-Scope Linter Sync initiated.`, 'info');
     
     setTimeout(() => {
       setIsSyncing(false);
-      addLog(`Full Sync #${nextExec} complete. All 5 policy vectors validated.`, 'success');
-      if (audits.length === 0) {
-        setAudits(INITIAL_AUDITS);
-        addLog('Policy deviations detected after node refresh. Manual intervention required.', 'warning');
-      }
+      addLog(`Full Sync #${nextExec} complete. Dynamics 365 & HubSpot vectors validated.`, 'success');
     }, 2500);
-  };
-
-  const handleExportCSV = () => {
-    addLog('Sentinel Ledger Export: Generating secure binary buffer...', 'info');
-    const headers = ['ID', 'Severity', 'Code', 'Message', 'Entity', 'Fix Action'];
-    const rows = audits.map(a => [
-      a.id,
-      a.severity,
-      a.code,
-      `"${a.message.replace(/"/g, '""')}"`,
-      `"${a.file.replace(/"/g, '""')}"`,
-      `"${a.fix.replace(/"/g, '""')}"`
-    ]);
-
-    const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `store_5065_audit_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    addLog('Export successful. Ledger downloaded to local client storage.', 'success');
-  };
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white p-3 border border-gray-200 shadow-lg rounded-lg outline-none min-w-[150px]">
-          <p className="font-bold text-gray-900 mb-2 border-b border-gray-100 pb-1">{label}</p>
-          <div className="space-y-1.5">
-              <div className="flex justify-between items-center gap-4">
-                  <span className="text-sm text-gray-500">Sales</span>
-                  <span className="text-sm font-bold text-blue-600">${data.sales.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                  <span className="text-xs text-gray-500">Active Staff</span>
-                  <span className="text-xs font-medium text-gray-700">{data.activeStaff}</span>
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                  <span className="text-xs text-gray-500">Avg Wait</span>
-                  <span className="text-xs font-medium text-gray-700">{data.waitTime}</span>
-              </div>
-          </div>
-        </div>
-      );
-    }
-    return null;
   };
 
   return (
     <div className="flex-1 bg-gray-50 overflow-auto">
-      <Header title="Operations Hub" subtitle="Enterprise Edition 3.0.0 • Real-time Monitoring & Audit" />
+      <Header title="Operations Hub" subtitle="Enterprise Edition 3.1.0 • Real-time Monitoring & Floor Vision" />
 
       <div className="p-8 max-w-7xl mx-auto space-y-8">
         
@@ -187,6 +121,14 @@ const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
            >
              Department Performance
              {activeTab === 'metrics' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full" />}
+           </button>
+           <button 
+             onClick={() => setActiveTab('vision')}
+             className={`px-4 py-3 text-sm font-bold transition-all relative flex items-center gap-2 ${activeTab === 'vision' ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
+           >
+             <Eye className="w-4 h-4" />
+             Floor Vision
+             {activeTab === 'vision' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full" />}
            </button>
            <button 
              onClick={() => setActiveTab('audit')}
@@ -203,15 +145,8 @@ const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
            </button>
         </div>
 
-        {activeTab === 'metrics' ? (
-          <>
-            <div className="flex justify-between items-center">
-               <h2 className="text-lg font-semibold text-gray-800">Department Metrics</h2>
-               <button className="text-sm text-blue-600 flex items-center gap-1 hover:underline">
-                 <RefreshCcw className="w-3 h-3" /> Refresh Data
-               </button>
-            </div>
-
+        {activeTab === 'metrics' && (
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {DEPARTMENT_METRICS.map((dept, index) => (
                 <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden group">
@@ -270,71 +205,83 @@ const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
                 </div>
               ))}
             </div>
+          </div>
+        )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-               <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="font-semibold text-gray-900">Sales by Department</h3>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <div className="w-3 h-3 border border-gray-300 bg-gray-200"></div>
-                      <span>Below Avg</span>
-                      <div className="w-3 h-3 bg-blue-500"></div>
-                      <span>Above Avg</span>
+        {activeTab === 'vision' && (
+          <div className="animate-in fade-in zoom-in-95 duration-500 space-y-6">
+             <div className="bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl relative aspect-video group">
+                {/* Simulated Camera Overlay */}
+                <div className="absolute inset-0 z-10 pointer-events-none p-6 flex flex-col justify-between">
+                   <div className="flex justify-between items-start">
+                      <div className="bg-red-600 text-white px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest flex items-center gap-2 animate-pulse">
+                         <Radio className="w-3 h-3" /> REC
+                      </div>
+                      <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-lg border border-white/10 text-white">
+                         <p className="text-[10px] font-mono font-bold tracking-widest">{activeCamera}</p>
+                         <p className="text-[9px] font-mono text-slate-400 mt-0.5">LATENCY: 42ms • AI_OVERLAY: ACTIVE</p>
+                      </div>
+                   </div>
+                   
+                   <div className="flex justify-between items-end">
+                      <div className="bg-black/60 backdrop-blur-md p-4 rounded-xl border border-white/10 text-white space-y-2">
+                         <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            <span className="text-[10px] font-mono font-bold">DENSITY ANALYSIS: LOW (4%)</span>
+                         </div>
+                         <div className="w-48 h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div className="w-4/100 h-full bg-emerald-500" />
+                         </div>
+                      </div>
+                      <div className="flex gap-2">
+                         <button className="p-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-all backdrop-blur-md border border-white/10">
+                            <Maximize2 className="w-4 h-4" />
+                         </button>
+                      </div>
+                   </div>
+                </div>
+
+                {/* Simulated Feed Background */}
+                <div className="absolute inset-0 bg-[#0a0a0a] flex items-center justify-center overflow-hidden">
+                    <div className="w-full h-full bg-slate-900/50 relative">
+                        {/* CSS-based grid lines for the high-tech look */}
+                        <div className="absolute inset-0" style={{backgroundImage: 'linear-gradient(#ffffff05 1px, transparent 1px), linear-gradient(90deg, #ffffff05 1px, transparent 1px)', backgroundSize: '40px 40px'}}></div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+                            <Activity className="w-12 h-12 text-slate-800 mx-auto mb-4 animate-pulse" />
+                            <p className="text-slate-700 font-mono text-[10px] font-bold uppercase tracking-[0.4em]">Floor Vision Stream active</p>
+                        </div>
                     </div>
-                  </div>
-                  <div className="h-72">
-                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                          <XAxis type="number" hide />
-                          <YAxis dataKey="name" type="category" width={100} tick={{fontSize: 12, fill: '#64748b'}} />
-                          <Tooltip 
-                            cursor={{fill: 'transparent'}} 
-                            content={<CustomTooltip />}
-                          />
-                          <ReferenceLine x={averageSales} stroke="#ef4444" strokeDasharray="3 3">
-                            <Label value={`Avg: $${Math.round(averageSales / 1000)}k`} position="top" fill="#ef4444" fontSize={10} />
-                          </ReferenceLine>
-                          <Bar dataKey="sales" radius={[0, 4, 4, 0]} barSize={20}>
-                            {chartData.map((entry, index) => (
-                              <Cell 
-                                key={`cell-${index}`} 
-                                fill={entry.sales > averageSales ? '#3b82f6' : '#cbd5e1'}
-                              />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                     </ResponsiveContainer>
-                  </div>
-               </div>
+                </div>
+                
+                {/* HUD Scanline */}
+                <div className="absolute inset-0 z-20 pointer-events-none opacity-20 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px]"></div>
+             </div>
 
-               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                  <h3 className="font-semibold text-gray-900 mb-4">Live Product Velocity</h3>
-                  <div className="space-y-4">
-                     {[
-                       {name: 'iPhone 15 Pro', cat: 'Electronics', price: '$12,450', color: 'bg-blue-100 text-blue-600'},
-                       {name: 'Organic Milk', cat: 'Grocery', price: '$8,920', color: 'bg-green-100 text-green-600'},
-                       {name: 'Nike Air Max', cat: 'Apparel', price: '$6,780', color: 'bg-orange-100 text-orange-600'},
-                       {name: 'Coffee Maker', cat: 'Home Goods', price: '$4,560', color: 'bg-purple-100 text-purple-600'},
-                       {name: 'Vitamins Pack', cat: 'Pharmacy', price: '$3,240', color: 'bg-teal-100 text-teal-600'},
-                     ].map((item, i) => (
-                       <div key={i} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors group">
-                          <div className="flex items-center gap-3">
-                             <div className={`w-8 h-8 rounded-lg ${item.color} flex items-center justify-center font-bold text-xs`}>
-                               {i + 1}
-                             </div>
-                             <div>
-                               <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{item.name}</p>
-                               <p className="text-xs text-gray-500">{item.cat}</p>
-                             </div>
-                          </div>
-                          <span className="text-sm font-semibold text-gray-700">{item.price}</span>
-                       </div>
-                     ))}
-                  </div>
-               </div>
-            </div>
-          </>
-        ) : (
+             <div className="grid grid-cols-4 gap-4">
+                {[
+                   {id: 'CAM_01_CHECKOUT', label: 'Front End Main', status: 'Online'},
+                   {id: 'CAM_02_GROCERY', label: 'Fresh Produce', status: 'Online'},
+                   {id: 'CAM_03_ELECTRONICS', label: 'High Value Cage', status: 'Online'},
+                   {id: 'CAM_04_PHARMACY', label: 'RX Distribution', status: 'Online'}
+                ].map(cam => (
+                   <button 
+                     key={cam.id}
+                     onClick={() => setActiveCamera(cam.id)}
+                     className={`p-4 rounded-xl border text-left transition-all ${
+                        activeCamera === cam.id 
+                        ? 'bg-blue-600 border-blue-500 shadow-lg shadow-blue-500/20' 
+                        : 'bg-white border-gray-200 hover:border-gray-300'
+                     }`}
+                   >
+                      <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${activeCamera === cam.id ? 'text-blue-100' : 'text-gray-400'}`}>CAM {cam.id.split('_')[1]}</p>
+                      <p className={`text-xs font-bold ${activeCamera === cam.id ? 'text-white' : 'text-gray-900'}`}>{cam.label}</p>
+                   </button>
+                ))}
+             </div>
+          </div>
+        )}
+
+        {activeTab === 'audit' && (
           <div className="space-y-6 animate-in fade-in duration-500">
              <div className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
                 <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
@@ -343,8 +290,8 @@ const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
                         <Terminal className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                        <h3 className="text-white font-bold">Operational Linter v3.0</h3>
-                        <p className="text-slate-400 text-xs mt-0.5 font-mono">Auditing Store 5065 Live Performance...</p>
+                        <h3 className="text-white font-bold">Operational Linter v3.1</h3>
+                        <p className="text-slate-400 text-xs mt-0.5 font-mono">Dynamics & HubSpot telemetry analysis...</p>
                     </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -354,9 +301,6 @@ const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
                         </div>
                         <div className="flex items-center gap-1 text-[10px] font-bold px-2 text-orange-400 border-r border-slate-700">
                             <Info className="w-3 h-3" /> {audits.filter(a => a.severity === 'warning').length} WARN
-                        </div>
-                        <div className="flex items-center gap-1 text-[10px] font-bold px-2 text-blue-400">
-                            <CheckCircle className="w-3 h-3" /> {INITIAL_AUDITS.length - audits.length + audits.filter(a => a.severity === 'info').length} OK
                         </div>
                     </div>
                     </div>
@@ -380,85 +324,46 @@ const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/50">
-                        {audits.length > 0 ? (
-                            audits.map((audit) => (
-                                <tr key={audit.id} className="hover:bg-slate-800/20 group transition-colors">
-                                <td className="px-6 py-4">
-                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                                        audit.severity === 'error' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                                        audit.severity === 'warning' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
-                                        'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                                    }`}>
-                                        {audit.severity}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 text-slate-300 text-xs">{audit.code}</td>
-                                <td className="px-6 py-4 text-white text-xs font-medium">{audit.message}</td>
-                                <td className="px-6 py-4 text-slate-500 text-xs italic">{audit.file}</td>
-                                <td className="px-6 py-4 text-right">
-                                    {audit.fix !== 'No action' ? (
-                                        <button 
-                                            onClick={() => handleQuickFix(audit.id)}
-                                            disabled={fixingId === audit.id}
-                                            className="text-blue-400 hover:text-white flex items-center gap-1.5 text-[10px] font-bold ml-auto bg-blue-500/10 px-3 py-1 rounded-md border border-blue-500/20 hover:bg-blue-500/30 transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            {fixingId === audit.id ? (
-                                                <>
-                                                    <Loader2 className="w-3 h-3 animate-spin" /> Fixing...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Play className="w-3 h-3" /> {audit.fix}
-                                                </>
-                                            )}
-                                        </button>
-                                    ) : (
-                                        <span className="text-slate-600 text-[10px]">VERIFIED</span>
-                                    )}
-                                </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={5} className="px-6 py-20 text-center">
-                                    <div className="flex flex-col items-center">
-                                        <CheckCircle className="w-12 h-12 text-emerald-500 mb-4 opacity-20" />
-                                        <p className="text-slate-500 text-sm tracking-wide">No active linting errors. System clean.</p>
-                                        <button 
-                                            onClick={() => {
-                                                setAudits(INITIAL_AUDITS);
-                                                addLog('Sentinel Ledger: Audit log reset manually.', 'info');
-                                            }}
-                                            className="mt-4 text-blue-500 hover:text-blue-400 text-xs font-bold"
-                                        >
-                                            Reset Audit Log
-                                        </button>
-                                    </div>
-                                </td>
+                        {audits.map((audit) => (
+                            <tr key={audit.id} className="hover:bg-slate-800/20 group transition-colors">
+                            <td className="px-6 py-4">
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                    audit.severity === 'error' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                                    audit.severity === 'warning' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
+                                    'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                }`}>
+                                    {audit.severity}
+                                </span>
+                            </td>
+                            <td className="px-6 py-4 text-slate-300 text-xs">{audit.code}</td>
+                            <td className="px-6 py-4 text-white text-xs font-medium">{audit.message}</td>
+                            <td className="px-6 py-4 text-slate-500 text-xs italic">{audit.file}</td>
+                            <td className="px-6 py-4 text-right">
+                                {audit.fix !== 'No action' && (
+                                    <button 
+                                        onClick={() => handleQuickFix(audit.id)}
+                                        className="text-blue-400 hover:text-white flex items-center gap-1.5 text-[10px] font-bold ml-auto bg-blue-500/10 px-3 py-1 rounded-md border border-blue-500/20 hover:bg-blue-500/30 transition-all uppercase"
+                                    >
+                                        <Play className="w-3 h-3" /> {audit.fix}
+                                    </button>
+                                )}
+                            </td>
                             </tr>
-                        )}
+                        ))}
                     </tbody>
                     </table>
                 </div>
 
                 <div className="p-4 bg-slate-800/30 border-t border-slate-800 flex justify-between items-center">
-                    <p className="text-[10px] text-slate-500">Scan Complete: Dec 13, 2025 • {isSyncing ? '...' : '0.04s'} Execution Time</p>
+                    <p className="text-[10px] text-slate-500">Scan Complete: {new Date().toLocaleDateString()}</p>
                     <div className="flex gap-2">
-                    <button 
-                        onClick={handleExportCSV}
-                        disabled={audits.length === 0}
-                        className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white text-xs rounded transition-colors border border-slate-600 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <Download className="w-3 h-3" /> Export Audit CSV
-                    </button>
-                    <button 
-                        onClick={handleFullSync}
-                        disabled={isSyncing}
-                        className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded transition-colors font-bold shadow-lg shadow-blue-500/20 flex items-center gap-2 disabled:opacity-50"
-                    >
-                        {isSyncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCcw className="w-3 h-3" />}
-                        Run Full System Sync
-                    </button>
+                        <button 
+                            onClick={handleFullSync}
+                            disabled={isSyncing}
+                            className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded transition-colors font-bold shadow-lg shadow-blue-500/20 flex items-center gap-2"
+                        >
+                            <RefreshCcw className="w-3 h-3" /> Run Ingress Sync
+                        </button>
                     </div>
                 </div>
              </div>
@@ -499,16 +404,8 @@ const Operations: React.FC<OperationsProps> = ({ defaultTab = 'metrics' }) => {
                            </div>
                         </div>
                       ))}
-                      {linterLogs.length === 0 && (
-                        <div className="text-slate-700 italic flex items-center gap-2">
-                          <Loader2 className="w-3 h-3 animate-spin" /> Initializing Activity Bridge...
-                        </div>
-                      )}
                       <div ref={logEndRef} />
                    </div>
-                </div>
-                <div className="px-6 py-2 bg-slate-900/50 border-t border-slate-800 flex justify-end">
-                    <span className="text-[8px] font-mono text-slate-600 uppercase tracking-widest">Authorized Access Only • AES-256 Encrypted Stream</span>
                 </div>
              </div>
           </div>

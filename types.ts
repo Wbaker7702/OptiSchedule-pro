@@ -1,3 +1,4 @@
+
 export enum View {
   DASHBOARD = 'DASHBOARD',
   SCHEDULING = 'SCHEDULING',
@@ -6,6 +7,7 @@ export enum View {
   ANALYTICS = 'ANALYTICS',
   TEAM = 'TEAM',
   PLAYBOOK = 'PLAYBOOK',
+  SETTINGS = 'SETTINGS',
 }
 
 export interface Employee {

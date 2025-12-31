@@ -62,12 +62,12 @@ const Scheduling: React.FC<SchedulingProps> = ({ setCurrentView, onFinalize }) =
   };
 
   return (
-    <div className="flex-1 bg-gray-50 overflow-auto relative">
+    <div className="flex-1 bg-gray-50 overflow-auto relative text-gray-900">
       <Header title="Scheduling Center" subtitle="Optimize workforce allocation based on customer flow patterns" />
       
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all scale-100 border border-gray-100">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all scale-100 border border-gray-100 text-slate-900">
                 <div className="bg-[#002050] p-6 flex items-center justify-between">
                     <h3 className="text-white font-bold text-xl flex items-center gap-2">
                         <Database className="w-6 h-6 text-blue-400" />
@@ -79,49 +79,49 @@ const Scheduling: React.FC<SchedulingProps> = ({ setCurrentView, onFinalize }) =
                 </div>
                 
                 <div className="p-8">
-                    <p className="text-gray-600 text-sm mb-6 text-center leading-relaxed font-medium">
+                    <p className="text-slate-700 text-sm mb-6 text-center leading-relaxed font-semibold">
                         {isConnected 
                           ? "Modify your D365 environment settings below. Changes are enforced via the Sentinel Protocol."
                           : "Connect your Microsoft Dynamics 365 environment to synchronize enterprise resource planning and workforce deployment."}
                     </p>
 
-                    <form onSubmit={handleConnect} className="space-y-4">
+                    <form onSubmit={handleConnect} className="space-y-5">
                         <div>
-                            <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Environment URL</label>
+                            <label className="block text-[10px] font-black text-slate-800 uppercase tracking-widest mb-2">Environment URL</label>
                             <div className="relative">
                                 <input 
                                     type="text" 
                                     value={environmentUrl}
                                     onChange={(e) => setEnvironmentUrl(e.target.value)}
                                     placeholder="https://org.crm.dynamics.com"
-                                    className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all placeholder-gray-400 bg-gray-50 focus:bg-white font-mono text-sm"
+                                    className="w-full pl-4 pr-10 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all placeholder-slate-400 bg-white font-mono text-sm text-slate-900 font-bold"
                                     required={!isConnected}
                                 />
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
                                     <Globe className="w-4 h-4" />
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Tenant ID (Azure AD)</label>
+                            <label className="block text-[10px] font-black text-slate-800 uppercase tracking-widest mb-2">Tenant ID (Azure AD)</label>
                             <div className="relative">
                                 <input 
                                     type="text" 
                                     value={tenantId}
                                     onChange={(e) => setTenantId(e.target.value)}
                                     placeholder="00000000-0000-0000-0000-000000000000"
-                                    className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all placeholder-gray-400 bg-gray-50 focus:bg-white font-mono text-sm"
+                                    className="w-full pl-4 pr-10 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all placeholder-slate-400 bg-white font-mono text-sm text-slate-900 font-bold"
                                     required={!isConnected}
                                 />
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
                                     <ShieldCheck className="w-4 h-4" />
                                 </div>
                             </div>
                         </div>
 
                         <div className="space-y-3 pt-2">
-                            <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest">Enterprise Sync Scopes</label>
+                            <label className="block text-[10px] font-black text-slate-800 uppercase tracking-widest">Enterprise Sync Scopes</label>
                             <div className="grid grid-cols-2 gap-3">
                                 {[
                                     { key: 'employees', label: 'D365 HR Profiles', icon: UsersIcon },
@@ -132,20 +132,20 @@ const Scheduling: React.FC<SchedulingProps> = ({ setCurrentView, onFinalize }) =
                                     <div 
                                         key={item.key}
                                         onClick={() => toggleConfig(item.key as keyof typeof syncConfig)}
-                                        className={`cursor-pointer p-3 rounded-xl border flex items-center gap-3 transition-all ${
+                                        className={`cursor-pointer p-3 rounded-xl border-2 flex items-center gap-3 transition-all ${
                                             syncConfig[item.key as keyof typeof syncConfig] 
-                                            ? 'border-blue-600 bg-blue-50 text-blue-900' 
-                                            : 'border-gray-200 hover:border-gray-300 text-gray-500'
+                                            ? 'border-blue-600 bg-blue-50 text-blue-900 shadow-sm' 
+                                            : 'border-slate-100 hover:border-slate-200 text-slate-500'
                                         }`}
                                     >
-                                        <div className={`w-5 h-5 rounded flex items-center justify-center border ${
+                                        <div className={`w-5 h-5 rounded flex items-center justify-center border-2 ${
                                             syncConfig[item.key as keyof typeof syncConfig]
                                             ? 'bg-blue-600 border-blue-600'
-                                            : 'bg-white border-gray-300'
+                                            : 'bg-white border-slate-200'
                                         }`}>
                                             {syncConfig[item.key as keyof typeof syncConfig] && <Check className="w-3.5 h-3.5 text-white" />}
                                         </div>
-                                        <span className="text-xs font-bold uppercase tracking-wider">{item.label}</span>
+                                        <span className="text-xs font-black uppercase tracking-wider">{item.label}</span>
                                     </div>
                                 ))}
                             </div>
@@ -177,7 +177,7 @@ const Scheduling: React.FC<SchedulingProps> = ({ setCurrentView, onFinalize }) =
                    </div>
                    <div className="max-w-xl">
                      <h3 className="text-xl font-bold text-gray-900 mb-2 uppercase tracking-tight">Microsoft Dynamics 365 Core Required</h3>
-                     <p className="text-gray-500 leading-relaxed text-sm">
+                     <p className="text-gray-600 leading-relaxed text-sm font-medium">
                         To enforce the Sentinel "Zone Defense" protocol, you must integrate the Dynamics 365 Finance & Operations environment. This validates staffing against ERP pipeline data and sales velocity.
                      </p>
                    </div>
@@ -205,14 +205,14 @@ const Scheduling: React.FC<SchedulingProps> = ({ setCurrentView, onFinalize }) =
                     <h3 className="text-lg font-black text-gray-900 flex items-center gap-3 uppercase tracking-tight">
                         Enterprise ERP Node Online
                     </h3>
-                    <p className="text-xs text-gray-500 font-mono font-bold uppercase tracking-widest">Environment: <span className="text-blue-600">PRODUCTION-SECURE</span> • Tenant: <span className="text-blue-600 font-mono">D365-CORE-5065</span></p>
+                    <p className="text-xs text-slate-700 font-mono font-black uppercase tracking-widest">Environment: <span className="text-blue-700">PRODUCTION-SECURE</span> • Tenant: <span className="text-blue-700 font-mono">D365-CORE-5065</span></p>
                   </div>
                </div>
                
                <div className="flex items-center gap-3 w-full lg:w-auto justify-end">
                    <button 
                        onClick={() => setIsModalOpen(true)}
-                       className="flex items-center gap-2 px-4 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg text-xs font-black uppercase tracking-widest transition-all"
+                       className="flex items-center gap-2 px-4 py-2.5 text-slate-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg text-xs font-black uppercase tracking-widest transition-all"
                    >
                        <Settings className="w-4 h-4" />
                        Mapping
@@ -220,7 +220,7 @@ const Scheduling: React.FC<SchedulingProps> = ({ setCurrentView, onFinalize }) =
                    <button 
                        onClick={handleSync}
                        disabled={isSyncing}
-                       className={`flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg text-xs font-black uppercase tracking-widest transition-all shadow-sm ${isSyncing ? 'opacity-70 cursor-wait' : ''}`}
+                       className={`flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-slate-800 hover:bg-gray-50 rounded-lg text-xs font-black uppercase tracking-widest transition-all shadow-sm ${isSyncing ? 'opacity-70 cursor-wait' : ''}`}
                    >
                       <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin text-blue-600' : ''}`} />
                       {isSyncing ? 'Syncing...' : 'Force Dynamics Refresh'}
@@ -289,7 +289,7 @@ const Scheduling: React.FC<SchedulingProps> = ({ setCurrentView, onFinalize }) =
                 </div>
               </div>
            ) : (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden text-gray-900">
                  <div className="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                     <h3 className="font-black text-gray-900 text-xs uppercase tracking-widest">Dynamics 365 Data Bridge Log</h3>
                     <span className="text-[10px] font-mono text-emerald-600 font-bold uppercase tracking-widest flex items-center gap-2">
@@ -329,7 +329,7 @@ const Scheduling: React.FC<SchedulingProps> = ({ setCurrentView, onFinalize }) =
         </div>
 
         {/* Weekly Schedule Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-gray-900">
            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
              <div className="flex items-center gap-4">
                 <h3 className="font-black text-gray-900 uppercase tracking-widest text-xs">Workforce Deployment Ledger</h3>
@@ -372,7 +372,7 @@ const Scheduling: React.FC<SchedulingProps> = ({ setCurrentView, onFinalize }) =
                  </thead>
                  <tbody className="divide-y divide-gray-100 text-[11px] font-bold text-gray-800">
                     <tr>
-                       <td className="px-4 py-4 font-black uppercase tracking-wider text-gray-500">Segment Alpha (AM)</td>
+                       <td className="px-4 py-4 font-black uppercase tracking-wider text-gray-500">Front End (AM)</td>
                        <td className="px-4 py-4"><span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-[10px] font-black uppercase tracking-widest block w-fit">J. Smith</span></td>
                        <td className="px-4 py-4"><span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-[10px] font-black uppercase tracking-widest block w-fit">J. Smith</span></td>
                        <td className="px-4 py-4"><span className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-[10px] font-black uppercase tracking-widest block w-fit">A. Davis</span></td>
