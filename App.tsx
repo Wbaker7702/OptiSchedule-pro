@@ -11,6 +11,7 @@ import Settings from './pages/Settings';
 import Login from './components/Login';
 import SentinelAI from './components/SentinelAI';
 import { View } from './types';
+import { SecurityProvider } from './contexts/SecurityContext';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -59,20 +60,22 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar 
-        currentView={currentView} 
-        setCurrentView={(view) => {
-          if (view !== View.OPERATIONS) setOperationsTab('metrics');
-          setCurrentView(view);
-        }} 
-        onLogout={handleLogout}
-      />
-      <main className="flex-1 ml-64 flex flex-col h-screen relative">
-        {renderView()}
-        <SentinelAI />
-      </main>
-    </div>
+    <SecurityProvider>
+      <div className="flex h-screen bg-gray-50">
+        <Sidebar 
+          currentView={currentView} 
+          setCurrentView={(view) => {
+            if (view !== View.OPERATIONS) setOperationsTab('metrics');
+            setCurrentView(view);
+          }} 
+          onLogout={handleLogout}
+        />
+        <main className="flex-1 ml-64 flex flex-col h-screen relative">
+          {renderView()}
+          <SentinelAI />
+        </main>
+      </div>
+    </SecurityProvider>
   );
 };
 
