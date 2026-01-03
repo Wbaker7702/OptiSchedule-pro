@@ -19,7 +19,12 @@ import {
 } from 'lucide-react';
 import { APP_VERSION } from '../constants';
 
-const Settings: React.FC = () => {
+interface SettingsProps {
+  highContrast: boolean;
+  setHighContrast: (value: boolean) => void;
+}
+
+const Settings: React.FC<SettingsProps> = ({ highContrast, setHighContrast }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   
@@ -33,7 +38,6 @@ const Settings: React.FC = () => {
   const [autoRemediate, setAutoRemediate] = useState(true);
   
   // Interface Configuration
-  const [highContrast, setHighContrast] = useState(false);
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
   
   // ERP Configuration
