@@ -15,7 +15,7 @@ We take the security of our software seriously. If you suspect you have found a 
 
 ### How to Report
 
-Please send an email to security@example.com with the full details, including steps to reproduce the issue. 
+Please send an email to your-security-contact@your-domain.com with the full details, including steps to reproduce the issue. 
 
 ### Timeline
 
