@@ -12,6 +12,7 @@ import Login from './components/Login';
 import SentinelAI from './components/SentinelAI';
 import ErrorBoundary from './components/ErrorBoundary';
 import { View } from './types';
+import { SecurityProvider } from './contexts/SecurityContext';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -67,6 +68,8 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <div className={`flex h-screen bg-gray-50 ${highContrast ? 'grayscale contrast-125' : ''}`}>
+    <SecurityProvider>
+      <div className="flex h-screen bg-gray-50">
         <Sidebar 
           currentView={currentView} 
           setCurrentView={(view) => {
@@ -80,7 +83,7 @@ const App: React.FC = () => {
           <SentinelAI />
         </main>
       </div>
-    </ErrorBoundary>
+    </SecurityProvider>
   );
 };
 
