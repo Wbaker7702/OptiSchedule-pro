@@ -20,6 +20,12 @@ import { useSecurity, SecurityLevel, Environment, SyncFrequency } from '../conte
 
 type SettingsSection = 'security' | 'erp' | 'visual' | 'alerts';
 
+interface SettingsProps {
+  highContrast: boolean;
+  setHighContrast: (value: boolean) => void;
+}
+
+const Settings: React.FC<SettingsProps> = ({ highContrast, setHighContrast }) => {
 const Settings: React.FC = () => {
   const {
     securityLevel,
@@ -41,6 +47,12 @@ const Settings: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [hubspotLoading, setHubspotLoading] = useState(false);
   
+  // Sentinel Configuration
+  const [securityLevel, setSecurityLevel] = useState('High');
+  const [sessionTimeout, setSessionTimeout] = useState('30');
+  const [autoRemediate, setAutoRemediate] = useState(true);
+  
+  // Interface Configuration
   // Interface Configuration (kept local for now as it's UI only)
   const [highContrast, setHighContrast] = useState(false);
   const [animationsEnabled, setAnimationsEnabled] = useState(true);

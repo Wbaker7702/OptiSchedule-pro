@@ -10,6 +10,7 @@ import Playbook from './pages/Playbook';
 import Settings from './pages/Settings';
 import Login from './components/Login';
 import SentinelAI from './components/SentinelAI';
+import ErrorBoundary from './components/ErrorBoundary';
 import { View } from './types';
 import { SecurityProvider } from './contexts/SecurityContext';
 
@@ -17,6 +18,7 @@ const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentView, setCurrentView] = useState<View>(View.DASHBOARD);
   const [operationsTab, setOperationsTab] = useState<'metrics' | 'audit' | 'vision'>('metrics');
+  const [highContrast, setHighContrast] = useState(false);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
@@ -49,17 +51,23 @@ const App: React.FC = () => {
       case View.PLAYBOOK:
         return <Playbook setCurrentView={setCurrentView} />;
       case View.SETTINGS:
-        return <Settings />;
+        return <Settings highContrast={highContrast} setHighContrast={setHighContrast} />;
       default:
         return <Dashboard />;
     }
   };
 
   if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
+    return (
+      <ErrorBoundary>
+        <Login onLogin={handleLogin} />
+      </ErrorBoundary>
+    );
   }
 
   return (
+    <ErrorBoundary>
+      <div className={`flex h-screen bg-gray-50 ${highContrast ? 'grayscale contrast-125' : ''}`}>
     <SecurityProvider>
       <div className="flex h-screen bg-gray-50">
         <Sidebar 
